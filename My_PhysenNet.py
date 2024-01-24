@@ -157,6 +157,13 @@ if __name__ == "__main__":
                                 loss_value.item(),
                                 step)
                 
+                phase_diff = np.abs(gt_matrix-((pred_y).cpu().detach().numpy().reshape(shape[0],shape[1])))
+
+                writer.add_scalar('相位差',
+                                np.mean(phase_diff),
+                                step)
+                
+                
                 # 记录最好的模型权重
                 # 保存loss值最小的网络参数
                 if loss_value < best_loss:
