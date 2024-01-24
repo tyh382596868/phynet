@@ -80,7 +80,7 @@ if __name__ == "__main__":
     
     # hypar
     batch_size = 1
-    lr = 0.001
+    lr = 0.1
     epochs = 4000
 
     hypar_file = open(f"{result_folder}/hypar.txt","w")
@@ -111,6 +111,7 @@ if __name__ == "__main__":
     loss_mse = torch.nn.MSELoss()
     loss_tv = TVLoss()
     optimizer = torch.optim.Adam(net.parameters(), lr = lr)
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=200, gamma=0.995)
     print('creating loss and optimization')
 
     # 记录训练开始前的超参数，网络结构，输入强度图，gt图像
@@ -143,6 +144,8 @@ if __name__ == "__main__":
 
             loss_value.backward()
             optimizer.step()
+            
+            scheduler.step()
 
             
 
@@ -161,6 +164,10 @@ if __name__ == "__main__":
 
                 writer.add_scalar('相位差',
                                 np.mean(phase_diff),
+                                step)
+                last_lr = scheduler.get_last_lr()[-1]
+                writer.add_scalar('lr',
+                                last_lr,
                                 step)
                 
                 
