@@ -183,7 +183,8 @@ class net_model_v1(torch.nn.Module):
         self.layer_10 = torch.nn.Sequential(
             torch.nn.Conv2d(32, 1, (3, 3), stride = (1, 1), padding = 1),
             torch.nn.BatchNorm2d(1),
-            torch.nn.LeakyReLU()
+            
+            torch.nn.Sigmoid()
             )
         
     def forward(self, x):
@@ -219,7 +220,7 @@ class net_model_v1(torch.nn.Module):
         x9 = self.layer_09_03(self.layer_09_02(x9_2))
         
         #-------------------------------------------------------
-        x10 = self.layer_10(x9)
+        x10 = self.layer_10(x9)*torch.pi
         
         return x10
         
