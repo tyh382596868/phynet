@@ -1,7 +1,28 @@
 import torch
 import torchvision
 
-        
+class my_Sigmoid(torch.nn.Module):
+    r"""Applies the element-wise function:
+
+    .. math::
+        \text{Sigmoid}(x) = \sigma(x) = \frac{1}{1 + \exp(-x)}
+
+
+    Shape:
+        - Input: :math:`(*)`, where :math:`*` means any number of dimensions.
+        - Output: :math:`(*)`, same shape as the input.
+
+    .. image:: ../scripts/activation_images/Sigmoid.png
+
+    Examples::
+
+        >>> m = nn.Sigmoid()
+        >>> input = torch.randn(2)
+        >>> output = m(input)
+    """
+
+    def forward(self, input: torch.Tensor) -> torch.Tensor:
+        return torch.sigmoid(input)*torch.pi        
         
 class net_model_v1(torch.nn.Module):
     
@@ -184,7 +205,7 @@ class net_model_v1(torch.nn.Module):
             torch.nn.Conv2d(32, 1, (3, 3), stride = (1, 1), padding = 1),
             torch.nn.BatchNorm2d(1),
             
-            torch.nn.Sigmoid()
+            my_Sigmoid()
             )
         
     def forward(self, x):
@@ -220,7 +241,7 @@ class net_model_v1(torch.nn.Module):
         x9 = self.layer_09_03(self.layer_09_02(x9_2))
         
         #-------------------------------------------------------
-        x10 = self.layer_10(x9)*torch.pi
+        x10 = self.layer_10(x9)
         
         return x10
         
