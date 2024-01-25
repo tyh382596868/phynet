@@ -286,3 +286,10 @@ def prop(img,  dx=2.2e-6, dy=2.2e-6, lam=532e-9, dist=0.0788):
     # print(f'intensity{intensity}')
 
     return intensity
+print(__name__)
+if __name__=='__main__':
+    int1 = my_readtxt('D:\\tyh\PhysenNet_git\\traindata\\gt\\1536_1536_phase_ref_prop_pi.txt')
+    int2 = my_readtxt('D:\\tyh\PhysenNet_git\\traindata\\gt\\1536_1536_phase_facet_ref_prop_pi.txt')
+    dif = int1-int2
+    my_saveimage(dif,'D:\\tyh\\PhysenNet_git\\gtdif.png')
+    
