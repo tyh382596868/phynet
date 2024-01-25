@@ -47,17 +47,17 @@ if __name__ == "__main__":
     current_dir = os.getcwd()
 
 
-    root_path = 'D:\\tyh\PhysenNet_git'
-    measured_y_path_txt = f'D:\\tyh\\PhysenNet_git\\traindata\\exp\{name}.txt'
-    gt_txt = f'D:\\tyh\\PhysenNet_git\\traindata\\gt\\{name}.txt' #读取的原相位图txt文件名，现为face，0-pi
+    
+    measured_y_path_txt = f'/mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/traindata/exp/{name}.txt'
+    gt_txt = f'/mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/traindata/gt/{name}.txt' #读取的原相位图txt文件名，现为face，0-pi
     gt_matrix = my_readtxt(gt_txt)
     print(gt_matrix.dtype)
 
-    result_folder = f'D:\\tyh\PhysenNet_git\\result\\{name}\\{localtime}'
-    tb_folder = f'{result_folder}\\tb_folder'
+    result_folder = f'/mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/result/{name}/{localtime}'
+    tb_folder = f'{result_folder}/tb_folder'
 
-    weight_folder = f"{result_folder}\\weight_folder"
-    img_txt_folder = f'{result_folder}\\img_txt_folder'
+    weight_folder = f"{result_folder}/weight_folder"
+    img_txt_folder = f'{result_folder}/img_txt_folder'
 
     mkdir(tb_folder)
     mkdir(weight_folder)
