@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 
 from library import (my_readtxt,mkdir,visual_data,prop,my_saveimage,my_savetxt)
 from unet import net_model_v1
+from unetgood import UnetGenerator
 from loss import TVLoss
 from dataset import measured_y_txt_dataset256,measured_y_txt_dataset256_fast
 
@@ -37,7 +38,7 @@ if __name__ == "__main__":
 
     # 1.实验名称
     
-    image_name = 'phase_ref_prop_pi'#phase_sam_prop_pi
+    image_name = 'phase_diff_prop_pi'#phase_sam_prop_pi
     name = f'{shape[0]}_{shape[1]}_{image_name}' #读取0-pi归一化强度图txt文件名，
     # 2.用于相减参考的相位txt文件路径
 
@@ -102,7 +103,9 @@ if __name__ == "__main__":
     print('loading data')
 
     # 3.model
-    net = net_model_v1().to(device)
+    net = UnetGenerator(use_dropout=True).to(device)
+    net.train()
+    total = sum([param.nelement() for param in net.parameters()])
 
     print('creating model')
     
@@ -111,13 +114,14 @@ if __name__ == "__main__":
     loss_mse = torch.nn.MSELoss()
     loss_tv = TVLoss()
     optimizer = torch.optim.Adam(net.parameters(), lr = lr)
-    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=200, gamma=0.995)
+    # scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=200, gamma=0.995)
     print('creating loss and optimization')
 
     # 记录训练开始前的超参数，网络结构，输入强度图，gt图像
     hypar_file.write(f'batch_size {batch_size}\n')
     hypar_file.write(f'lr {lr}\n')
     hypar_file.write(f'epochs {epochs}\n')
+    hypar_file.write(f"Number of parameter: %.2fM {total/1e6}"  )
     hypar_file.write(f'network\n{net}\n')
     hypar_file.close()
 
@@ -145,7 +149,7 @@ if __name__ == "__main__":
             loss_value.backward()
             optimizer.step()
             
-            scheduler.step()
+            # scheduler.step()
 
             
 
@@ -165,10 +169,10 @@ if __name__ == "__main__":
                 writer.add_scalar('相位差',
                                 np.mean(phase_diff),
                                 step)
-                last_lr = scheduler.get_last_lr()[-1]
-                writer.add_scalar('lr',
-                                last_lr,
-                                step)
+                # last_lr = scheduler.get_last_lr()[-1]
+                # writer.add_scalar('lr',
+                #                 last_lr,
+                #                 step)
                 
                 
                 # 记录最好的模型权重
