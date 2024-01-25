@@ -37,7 +37,7 @@ if __name__ == "__main__":
 
     # 1.实验名称
     
-    image_name = 'phase_facet_ref_prop_pi'#phase_sam_prop_pi
+    image_name = 'phase_ref_prop_pi'#phase_sam_prop_pi
     name = f'{shape[0]}_{shape[1]}_{image_name}' #读取0-pi归一化强度图txt文件名，
     # 2.用于相减参考的相位txt文件路径
 
