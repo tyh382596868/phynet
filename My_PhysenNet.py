@@ -39,7 +39,7 @@ if __name__ == "__main__":
 
     # 1.实验名称
     
-    image_name = 'phase_diff_prop_pi'#phase_sam_prop_pi
+    image_name = 'phase_sam_prop_pi'#phase_sam_prop_pi
     name = f'{shape[0]}_{shape[1]}_{image_name}' #读取0-pi归一化强度图txt文件名，
     # 2.用于相减参考的相位txt文件路径
 
@@ -104,8 +104,9 @@ if __name__ == "__main__":
     print('loading data')
 
     # 3.model
-    net = ResnetGenerator(n_blocks=9).to(device)
+    # net = ResnetGenerator(n_blocks=9).to(device)
     # net = UnetGenerator(use_dropout=True).to(device)
+    net = net_model_v1().to(device)
     net.train()
     total = sum([param.nelement() for param in net.parameters()])
 
@@ -144,11 +145,11 @@ if __name__ == "__main__":
 
             measured_y,phase_dec = prop(pred_y[0, 0, :, :])
             
-            measured_y_mea,phase_mea = back_prop(phase_dec,y[0, 0, :, :])
+            # measured_y_mea,phase_mea = back_prop(phase_dec,y[0, 0, :, :])
             
             loss_mse_value = loss_mse(y.float(),measured_y.float())
-            loss_mse_mea_value = loss_mse(pred_y.float(),phase_mea.float())
-            loss_value =  loss_mse_value + loss_mse_mea_value*0.5
+            # loss_mse_mea_value = loss_mse(pred_y.float(),phase_mea.float())
+            loss_value =  loss_mse_value #+ loss_mse_mea_value*0.5
 
             # backward proapation
 

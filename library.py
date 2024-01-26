@@ -64,6 +64,25 @@ def my_saveimage(matrix,image_path):
     plt.savefig(image_path)
 
 
+def my_saveimage_pro(matrix,image_path):
+          
+    '''
+    matrix:float32 [H,W]
+    '''
+    plt.figure(figsize=(10,10),dpi=1000)
+    ax = plt.subplot()
+
+    im = ax.imshow(matrix,resample=True)
+
+    # create an Axes on the right side of ax. The width of cax will be 5%
+    # of ax and the padding between cax and ax will be fixed at 0.05 inch.
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes("right", size="5%", pad=0.05)
+
+    plt.colorbar(im, cax=cax)
+    plt.savefig(image_path)
+
+
       
 def my_savetxt(matrix,txt_path):
     '''
@@ -339,10 +358,106 @@ def back_prop(img,int , dx=2.2e-6, dy=2.2e-6, lam=532e-9, dist=-1*0.0788):
 
     return intensity,Id1
 
-print(__name__)
+
+   
+
+
 if __name__=='__main__':
-    int1 = my_readtxt('D:\\tyh\PhysenNet_git\\traindata\\gt\\1536_1536_phase_ref_prop_pi.txt')
-    int2 = my_readtxt('D:\\tyh\PhysenNet_git\\traindata\\gt\\1536_1536_phase_facet_ref_prop_pi.txt')
-    dif = int1-int2
-    my_saveimage(dif,'D:\\tyh\\PhysenNet_git\\gtdif.png')
+    
+    # 将fast算法和net_model_v1得到的样品相位相减得到比较
+    
+    fast = 'D:\\tyh\\PhysenNet_git\\rawsam-ref.txt'
+    net = 'D:\\tyh\\PhysenNet_git\\sam-ref.txt'
+
+    int1 = my_readtxt(fast)
+    int2 = my_readtxt(fast)
+    
+    dif = (int1-int2)
+    my_saveimage_pro(dif,'D:\\tyh\\PhysenNet_git\\fast-net.png')
+    my_savetxt(dif,'D:\\tyh\\PhysenNet_git\\fast-net.txt')
+    
+
+    
+    
+    '''
+    # 将fast算法和net_model_v1得到的样品相位相减得到比较
+    
+    fast = 'D:\\tyh\\PhysenNet_git\\rawsam-ref_pi_4.1_fil.txt'
+    net = 'D:\\tyh\\PhysenNet_git\\sam-ref_pi_4.1_fil.txt'
+
+    int1 = my_readtxt(fast)
+    int2 = my_readtxt(fast)
+    
+    dif = (int1-int2)
+    my_saveimage_pro(dif,'D:\\tyh\\PhysenNet_git\\fast-net_pi_4.1_fil.png')
+    my_savetxt(dif,'D:\\tyh\\PhysenNet_git\\fast-net_pi_4.1_fil.txt')    
+    
+    # 将FAST预测的样品畸变相位与光纤畸变相位相减得到样品相位
+    
+    img1 = 'D:\\tyh\\PhysenNet_git\\traindata\\gt\\1536_1536_phase_sam_prop_pi.txt'
+    img2 = 'D:\\tyh\\PhysenNet_git\\traindata\\gt\\1536_1536_phase_ref_prop_pi.txt'
+    maskpath = 'D:\\tyh\\FAST-main\\FAST-main\\mask.txt'
+    int1 = my_readtxt(img1)
+    int2 = my_readtxt(img2)
+
+    rawmask = my_readtxt(maskpath)
+    a = 128*12
+    c = 128*12
+    shape = [a,c]
+    b = 470
+    d = 150
+    mask = rawmask[0+d :shape[0]+d, 0+b:shape[1]+b]
+    
+    dif = (int1-int2)
+    my_saveimage_pro(dif,'D:\\tyh\\PhysenNet_git\\rawsam-ref.png')
+    my_savetxt(dif,'D:\\tyh\\PhysenNet_git\\rawsam-ref.txt')
+    
+    dif = (int1-int2)/np.pi
+    my_saveimage_pro(dif,'D:\\tyh\\PhysenNet_git\\rawsam-ref_pi.png')
+    my_savetxt(dif,'D:\\tyh\\PhysenNet_git\\rawsam-ref_pi.txt')
+    
+    dif = ((int1-int2+4.1)/np.pi)*mask
+    my_saveimage_pro(dif,'D:\\tyh\\PhysenNet_git\\rawsam-ref_pi_4.1.png')
+    my_savetxt(dif,'D:\\tyh\\PhysenNet_git\\rawsam-ref_pi_4.1.txt')
+    
+    import scipy.signal as signal
+    dif = signal.medfilt(dif,(11,11)) #二维中值滤波
+    my_saveimage_pro(dif,'D:\\tyh\\PhysenNet_git\\rawsam-ref_pi_4.1_fil.png')
+    my_savetxt(dif,'D:\\tyh\\PhysenNet_git\\rawsam-ref_pi_4.1_fil.txt')
+    
+    
+    # 将net_model_v1预测的样品畸变相位与光纤畸变相位相减得到样品相位
+    
+    img1 = 'D:\\tyh\PhysenNet_git\\result\\1536_1536_phase_sam_prop_pi\\2024-01-26-13-56\\img_txt_folder\\3500_pred.txt'
+    img2 = 'D:\\tyh\PhysenNet_git\\result\\1536_1536_phase_ref_prop_pi\\2024-01-25-15-43\\img_txt_folder\\2000_pred.txt'
+    maskpath = 'D:\\tyh\\FAST-main\\FAST-main\\mask.txt'
+    int1 = my_readtxt(img1)
+    int2 = my_readtxt(img2)
+    
+    rawmask = my_readtxt(maskpath)
+    a = 128*12
+    c = 128*12
+    shape = [a,c]
+    b = 470
+    d = 150
+    mask = rawmask[0+d :shape[0]+d, 0+b:shape[1]+b]
+    
+    dif = (int1-int2)
+    my_saveimage_pro(dif,'D:\\tyh\\PhysenNet_git\\sam-ref.png')
+    my_savetxt(dif,'D:\\tyh\\PhysenNet_git\\sam-ref.txt')
+    
+    dif = (int1-int2)/np.pi
+    my_saveimage_pro(dif,'D:\\tyh\\PhysenNet_git\\sam-ref_pi.png')
+    my_savetxt(dif,'D:\\tyh\\PhysenNet_git\\sam-ref_pi.txt')
+    
+    dif = ((int1-int2+4.1)/np.pi)*mask
+    my_saveimage_pro(dif,'D:\\tyh\\PhysenNet_git\\sam-ref_pi_4.1.png')
+    my_savetxt(dif,'D:\\tyh\\PhysenNet_git\\sam-ref_pi_4.1.txt')
+    
+    import scipy.signal as signal
+    dif = signal.medfilt(dif,(11,11)) #二维中值滤波
+    my_saveimage_pro(dif,'D:\\tyh\\PhysenNet_git\\sam-ref_pi_4.1_fil.png')
+    my_savetxt(dif,'D:\\tyh\\PhysenNet_git\\sam-ref_pi_4.1_fil.txt')
+    '''
+
     
