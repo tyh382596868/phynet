@@ -285,7 +285,60 @@ def prop(img,  dx=2.2e-6, dy=2.2e-6, lam=532e-9, dist=0.0788):
     # print(f'torch.max(intensity){torch.max(intensity)}')
     # print(f'intensity{intensity}')
 
-    return intensity
+    return intensity,Id1
+
+def back_prop(img,int , dx=2.2e-6, dy=2.2e-6, lam=532e-9, dist=-1*0.0788):
+    '''
+    1.注意传播距离，确保生成图像的传播距离与训练的传播距离一致，一般默认一致
+    2.输入数据的维度应该为二维，如果是三维，就算值一样傅里叶变换后也不一样
+    '''
+
+    # print(torch.max(img))
+
+    img_phase = img #*torch.pi
+
+    # print(torch.max(img_phase))
+    
+    H = torch.exp(1j * img_phase) * int
+    fft_H = torch.fft.ifftshift(torch.fft.fft2(H))
+    # H = torch.exp(1j * img) 
+    # (Ny,Nx) = H.size()
+    # fft_H = torch.fft.ifftshift(torch.fft.fft2(H)).to(device)
+    # the axis in frequency space
+    # qx = torch.linspace(0.25/xstart, 0.25/xend, nx) * nx
+    # qy = torch.linspace(0.25/ystart, 0.25/yend, ny) * ny
+    
+    # qx = torch.range(1-Nx/2, Nx/2, 1).to(device)
+    # qy = torch.range(1-Ny/2, Ny/2, 1).to(device)
+    # # print(qx)
+    # y, x = torch.meshgrid(qx, qy)
+    # # print(f'mesh_qx{mesh_qx}')
+    # # print(f'mesh_qy{mesh_qy}')
+    (Ny,Nx) = H.shape[0],H.shape[1]
+    
+    qx = torch.range(1-Nx/2, Nx/2, 1).cuda()
+    qy = torch.range(1-Ny/2, Ny/2, 1).cuda()
+    y, x = torch.meshgrid(qy, qx)
+    r=(2*torch.pi*x/(dx*Nx))**2+(2*torch.pi*y/(dy*Ny))**2
+
+    k=2*torch.pi/lam
+
+    kernel=torch.exp(-1*1j*torch.sqrt(k**2-r)*dist)
+
+    fft_HH=fft_H[:,:]*kernel
+    fft_HH=torch.fft.fftshift(fft_HH)
+
+    Ud=torch.fft.ifft2(fft_HH)
+
+    Id=Ud
+    Id1=torch.angle(Ud)
+    intensity = torch.abs(Id) * torch.abs(Id)
+ 
+    # print(f'torch.max(intensity){torch.max(intensity)}')
+    # print(f'intensity{intensity}')
+
+    return intensity,Id1
+
 print(__name__)
 if __name__=='__main__':
     int1 = my_readtxt('D:\\tyh\PhysenNet_git\\traindata\\gt\\1536_1536_phase_ref_prop_pi.txt')

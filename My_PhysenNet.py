@@ -11,9 +11,10 @@ import time
 import numpy as np
 import matplotlib.pyplot as plt
 
-from library import (my_readtxt,mkdir,visual_data,prop,my_saveimage,my_savetxt)
+from library import (my_readtxt,mkdir,visual_data,prop,my_saveimage,my_savetxt,back_prop)
 from unet import net_model_v1
 from unetgood import UnetGenerator
+from resnet9 import ResnetGenerator
 from loss import TVLoss
 from dataset import measured_y_txt_dataset256,measured_y_txt_dataset256_fast
 
@@ -103,7 +104,8 @@ if __name__ == "__main__":
     print('loading data')
 
     # 3.model
-    net = UnetGenerator(use_dropout=True).to(device)
+    net = ResnetGenerator(n_blocks=9).to(device)
+    # net = UnetGenerator(use_dropout=True).to(device)
     net.train()
     total = sum([param.nelement() for param in net.parameters()])
 
@@ -140,9 +142,13 @@ if __name__ == "__main__":
             
 
 
-            measured_y = prop(pred_y[0, 0, :, :])
+            measured_y,phase_dec = prop(pred_y[0, 0, :, :])
+            
+            measured_y_mea,phase_mea = back_prop(phase_dec,y[0, 0, :, :])
+            
             loss_mse_value = loss_mse(y.float(),measured_y.float())
-            loss_value =  loss_mse_value
+            loss_mse_mea_value = loss_mse(pred_y.float(),phase_mea.float())
+            loss_value =  loss_mse_value + loss_mse_mea_value*0.5
 
             # backward proapation
 
