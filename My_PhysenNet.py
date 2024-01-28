@@ -13,6 +13,8 @@ import matplotlib.pyplot as plt
 
 from library import (my_readtxt,mkdir,visual_data,prop,my_saveimage,my_savetxt)
 from unet import net_model_v1
+from unetgood import UnetGenerator
+
 from loss import TVLoss
 from dataset import measured_y_txt_dataset256,measured_y_txt_dataset256_fast
 
@@ -30,6 +32,8 @@ from tqdm import tqdm
 # main
 
 if __name__ == "__main__":
+
+    target = '网络最后一层改成leakrelu，对比一下和sigmoid相比怎么样'
 
     a = 128*4
     c = 128*4
@@ -102,7 +106,8 @@ if __name__ == "__main__":
     print('loading data')
 
     # 3.model
-    net = net_model_v1().to(device)
+    # net = net_model_v1().to(device)
+    net = UnetGenerator().to(device)
 
     print('creating model')
     
@@ -115,6 +120,7 @@ if __name__ == "__main__":
     print('creating loss and optimization')
 
     # 记录训练开始前的超参数，网络结构，输入强度图，gt图像
+    hypar_file.write(f'target： {target}\n')
     hypar_file.write(f'batch_size {batch_size}\n')
     hypar_file.write(f'lr {lr}\n')
     hypar_file.write(f'epochs {epochs}\n')
