@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 from library import (my_readtxt,mkdir,visual_data,prop,my_saveimage,my_savetxt)
 from unet import net_model_v1
 from unetgood import UnetGenerator
+from baseunet import UnetGeneratorDouble,UNet
 
 from loss import TVLoss
 from dataset import measured_y_txt_dataset256,measured_y_txt_dataset256_fast
@@ -35,13 +36,13 @@ if __name__ == "__main__":
 
     target = '网络最后一层改成leakrelu，对比一下和sigmoid相比怎么样'
 
-    a = 128*4
-    c = 128*4
+    a = 128*12
+    c = 128*12
     shape = [a,c]
 
     # 1.实验名称
     
-    image_name = 'imagenet_prop_pi'#0801_prop_pi,imagenet_prop_pi,imagenet256_prop_pi
+    image_name = 'phase_diff_prop_pi'#imagenet_prop_pi,0801_prop_pi,imagenet_prop_pi,imagenet256_prop_pi
     name = f'{shape[0]}_{shape[1]}_{image_name}' #读取0-pi归一化强度图txt文件名，
     # 2.用于相减参考的相位txt文件路径
 
@@ -107,7 +108,9 @@ if __name__ == "__main__":
 
     # 3.model
     # net = net_model_v1().to(device)
-    net = UnetGenerator().to(device)
+    # net = UnetGenerator().to(device)
+    # net = UnetGeneratorDouble().to('cuda')
+    net = UNet().to('cuda')
 
     print('creating model')
     

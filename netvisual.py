@@ -49,13 +49,14 @@ from torchsummary import summary
 # myNet = vgg16().to('cuda')  # 实例化网络，可以换成自己的网络
 # summary(myNet, (3, 64, 64))  # 输出网络结构
 
-# from unetgood import UnetGenerator
-# myNet = UnetGenerator().to('cuda')#  # 实例化网络，可以换成自己的网络
+from unetgood import UnetGenerator
+myNet = UnetGenerator().to('cuda')#  # 实例化网络，可以换成自己的网络
 # summary(myNet, input_size=(1, 512, 512))  # 输出网络结构
+print(myNet)
 
-from unet import net_model_v1
-myNet = net_model_v1().to('cuda')
-summary(myNet, input_size=(1, 512, 512))  # 输出网络结构
+# from unet import net_model_v1
+# myNet = net_model_v1().to('cuda')
+# summary(myNet, input_size=(1, 512, 512))  # 输出网络结构
 
 
 
