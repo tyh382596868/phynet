@@ -289,27 +289,34 @@ def prop(img,  dx=2.2e-6, dy=2.2e-6, lam=532e-9, dist=0.0788):
 
 if __name__=='__main__':
 
-    dif = my_readtxt('/mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/traindata/gt/512_512_imagenet_prop_pi.txt')
-    dif640 = np.pad(dif,(64,64),'constant')
+    ref_path = '/mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/result/1536_1536_phase_ref_prop_pi/2024-01-30-21-41/img_txt_folder/3500_pred.txt'
+    sam_path=  '/mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/result/1536_1536_phase_sam_prop_pi/2024-01-30-21-56/img_txt_folder/3500_pred.txt'
+    ref = my_readtxt(ref_path)
+    sam = my_readtxt(sam_path)
+    diff = ref - sam
+    save_path = './diff.png'
+    my_saveimage(diff,save_path)
+    # dif = my_readtxt('/mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/traindata/gt/512_512_imagenet_prop_pi.txt')
+    # dif640 = np.pad(dif,(64,64),'constant')
 
     # noise = (np.random.random((512,512))+np.random.random((512,512))+np.random.random((512,512)))/3
     # ref = noise*np.pi
     # ref640 = np.pad(ref,(64,64),'constant')
 
-    noise = my_readtxt('/mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/traindata/gt/1536_1536_phase_ref_prop_pi.txt')
-    ref = noise[768-256:768+256,768-256:768+256]
-    ref640 = np.pad(ref,(64,64),'constant')
+    # noise = my_readtxt('/mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/traindata/gt/1536_1536_phase_ref_prop_pi.txt')
+    # ref = noise[768-256:768+256,768-256:768+256]
+    # ref640 = np.pad(ref,(64,64),'constant')
 
-    sam640 = (dif640+ref640)/np.pi
-    # # print(ref.shape())
-    # # print(ref640.shape())
-    # my_saveimage(ref640,'./temp.png')
-    my_saveimage(dif640,'/mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/traindata/gt/dif640.png')
-    my_savetxt(dif640,'/mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/traindata/gt/dif640.txt')
+    # sam640 = (dif640+ref640)/np.pi
+    # # # print(ref.shape())
+    # # # print(ref640.shape())
+    # # my_saveimage(ref640,'./temp.png')
+    # my_saveimage(dif640,'/mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/traindata/gt/dif640.png')
+    # my_savetxt(dif640,'/mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/traindata/gt/dif640.txt')
 
-    my_saveimage(ref640,'/mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/traindata/gt/ref640.png')
-    my_savetxt(ref640,'/mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/traindata/gt/ref640.txt')
+    # my_saveimage(ref640,'/mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/traindata/gt/ref640.png')
+    # my_savetxt(ref640,'/mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/traindata/gt/ref640.txt')
     
-    my_saveimage(sam640,'/mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/traindata/gt/sam640.png')
-    my_savetxt(sam640,'/mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/traindata/gt/sam640.txt')
+    # my_saveimage(sam640,'/mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/traindata/gt/sam640.png')
+    # my_savetxt(sam640,'/mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/traindata/gt/sam640.txt')
 
