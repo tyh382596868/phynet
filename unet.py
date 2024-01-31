@@ -211,37 +211,44 @@ class net_model_v1(torch.nn.Module):
     def forward(self, x):
         
         #-------------------------------------------------------
-        x6_0 = self.layer_06_01(self.layer_part1(x))
-        x6_1 = self.layer_04(
-            self.layer_03_maxpool(self.layer_03(self.layer_02_maxpool(
-                self.layer_02(self.layer_01_maxpool(self.layer_01(x)))
-                )))
-            )
-        x6_2 = torch.cat((x6_0, x6_1), 1)
-        x6 = self.layer_06_03(self.layer_06_02(x6_2))
+        enc1 = self.layer_01(x)
+        enc2 = self.layer_02(self.layer_01_maxpool(enc1))
+        enc3 = self.layer_03(self.layer_02_maxpool(enc2))
+        enc4 = self.layer_04(self.layer_03_maxpool(enc3))
+
+        bottleneck = self.layer_05(self.layer_04_maxpool(enc4))
+        
+        dec4 = self.layer_06_01(bottleneck)
+        # x6_1 = self.layer_04(
+        #     self.layer_03_maxpool(self.layer_03(self.layer_02_maxpool(
+        #         self.layer_02(self.layer_01_maxpool(self.layer_01(x)))
+        #         )))
+        #     )
+        dec4 = torch.cat((dec4, enc4), 1)
+        dec4 = self.layer_06_03(self.layer_06_02(dec4))
         
         #-------------------------------------------------------
-        x7_0 = self.layer_07_01(x6)
-        x7_1 = self.layer_03(self.layer_02_maxpool(
-            self.layer_02(self.layer_01_maxpool(self.layer_01(x)))
-            ))
-        x7_2 = torch.cat((x7_0, x7_1), 1)
-        x7 = self.layer_07_03(self.layer_07_02(x7_2))
+        dec3 = self.layer_07_01(dec4)
+        # x7_1 = self.layer_03(self.layer_02_maxpool(
+        #     self.layer_02(self.layer_01_maxpool(self.layer_01(x)))
+        #     ))
+        dec3 = torch.cat((dec3, enc3), 1)
+        dec3 = self.layer_07_03(self.layer_07_02(dec3))
         
         #-------------------------------------------------------
-        x8_0 = self.layer_08_01(x7)
-        x8_1 = self.layer_02(self.layer_01_maxpool(self.layer_01(x)))
-        x8_2 = torch.cat((x8_0, x8_1), 1)
-        x8 = self.layer_08_03(self.layer_08_02(x8_2))
+        dec2 = self.layer_08_01(dec3)
+        # x8_1 = self.layer_02(self.layer_01_maxpool(self.layer_01(x)))
+        dec2 = torch.cat((dec2, enc2), 1)
+        dec2 = self.layer_08_03(self.layer_08_02(dec2))
         
         #-------------------------------------------------------
-        x9_0 = self.layer_09_01(x8)
-        x9_1 = self.layer_01(x)
-        x9_2 = torch.cat((x9_0, x9_1), 1)
-        x9 = self.layer_09_03(self.layer_09_02(x9_2))
+        dec1 = self.layer_09_01(dec2)
+        # x9_1 = self.layer_01(x)
+        dec1 = torch.cat((dec1, enc1), 1)
+        dec1 = self.layer_09_03(self.layer_09_02(dec1))
         
         #-------------------------------------------------------
-        x10 = self.layer_10(x9)
+        x10 = self.layer_10(dec1)
         
         return x10
         
