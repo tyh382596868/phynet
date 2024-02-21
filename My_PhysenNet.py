@@ -42,7 +42,7 @@ if __name__ == "__main__":
 
     # 1.实验名称
     
-    image_name = 'phase_sam_prop_pi'#imagenet_prop_pi,0801_prop_pi,imagenet_prop_pi,imagenet256_prop_pi
+    image_name = 'sam_pi_01_prop_pi'#phase_diff_prop_pi,imagenet_prop_pi,0801_prop_pi,imagenet_prop_pi,imagenet256_prop_pi
     name = f'{shape[0]}_{shape[1]}_{image_name}' #读取0-pi归一化强度图txt文件名，
     # 2.用于相减参考的相位txt文件路径
 
@@ -86,7 +86,7 @@ if __name__ == "__main__":
     # hypar
     batch_size = 1
     lr = 0.1
-    epochs = 4000
+    epochs = 40000
 
     hypar_file = open(f"{result_folder}/hypar.txt","w")
 
@@ -107,10 +107,13 @@ if __name__ == "__main__":
     print('loading data')
 
     # 3.model
-    # net = net_model_v1().to(device)
+    net = net_model_v1().to(device)
     # net = UnetGenerator().to(device)
     # net = UnetGeneratorDouble().to('cuda')
-    net = UNet().to('cuda')
+    # net = UNet().to('cuda')
+
+    # model_path = '/mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/result/1536_1536_ref_pi_prop_pi/2024-02-01-12-22/weight_folder/best_model.pth'
+    # net.load_state_dict(torch.load(model_path))
 
     print('creating model')
     
@@ -119,7 +122,7 @@ if __name__ == "__main__":
     loss_mse = torch.nn.MSELoss()
     loss_tv = TVLoss()
     optimizer = torch.optim.Adam(net.parameters(), lr = lr)
-    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=200, gamma=0.995)
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=200, gamma=0.999)
     print('creating loss and optimization')
 
     # 记录训练开始前的超参数，网络结构，输入强度图，gt图像
@@ -145,7 +148,7 @@ if __name__ == "__main__":
             
 
 
-            measured_y = prop(pred_y[0, 0, :, :])
+            measured_y = prop(pred_y[0, 0, :, :],dist=0.01)
             loss_mse_value = loss_mse(y.float(),measured_y.float())
             loss_value =  loss_mse_value
 

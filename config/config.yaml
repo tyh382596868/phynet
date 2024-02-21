@@ -1,0 +1,6 @@
+device: 'cpu'
+
+data:
+    train_path: 'data/train'
+    test_path: 'test/train'
+    num: 1000
