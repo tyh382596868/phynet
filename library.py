@@ -42,7 +42,7 @@ def my_readimage(image_path):
     # print(f'max of image:{imgcvb.max()}')
     return imgcvb
 
-def my_saveimage(matrix,image_path,cmap):
+def my_saveimage(matrix,image_path,cmap='viridis'):
           
     '''
     matrix:float32 [H,W]
@@ -273,7 +273,7 @@ def visual_data(dataloader,root_path):
 #     return intensity
 
 
-def prop(img,  dx=2.2e-6, dy=2.2e-6, lam=532e-9, dist=0.0788):
+def prop(img,  dx=2.2e-6, dy=2.2e-6, lam=532e-9, dist=0.0788,device='cuda:0'):
     '''
     1.注意传播距离，确保生成图像的传播距离与训练的传播距离一致，一般默认一致
     2.输入数据的维度应该为二维，如果是三维，就算值一样傅里叶变换后也不一样
@@ -302,8 +302,8 @@ def prop(img,  dx=2.2e-6, dy=2.2e-6, lam=532e-9, dist=0.0788):
     # # print(f'mesh_qy{mesh_qy}')
     (Ny,Nx) = H.shape[0],H.shape[1]
     
-    qx = torch.range(1-Nx/2, Nx/2, 1).cuda()
-    qy = torch.range(1-Ny/2, Ny/2, 1).cuda()
+    qx = torch.range(1-Nx/2, Nx/2, 1).to(device)
+    qy = torch.range(1-Ny/2, Ny/2, 1).to(device)
     y, x = torch.meshgrid(qy, qx)
     r=(2*torch.pi*x/(dx*Nx))**2+(2*torch.pi*y/(dy*Ny))**2
 
