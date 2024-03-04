@@ -32,6 +32,7 @@ from config.parameter import Parameter,import_class
 if __name__ == "__main__":
 
 
+
     parser = argparse.ArgumentParser(description='Training script')
     parser.add_argument('--opt', type=str, default='./config.yml', help='Path to the configuration file')
     args = parser.parse_args()
