@@ -18,5 +18,12 @@
 # python train_loss.py --opt $CONFIG_FILE
 
 
-CONFIG_FILE="/mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/phynet/option/R_Droup.yaml"
-python train_R_Drop.py --opt $CONFIG_FILE
+# CONFIG_FILE="/mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/phynet/option/R_Droup.yaml"
+# python train_R_Drop.py --opt $CONFIG_FILE
+
+# CONFIG_FILE="/mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/phynet/option/net_model_Dropout/net_model_Dropout_p.yaml"
+CONFIG_FILE="/mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/phynet/option/net_model_Dropout_full/net_model_Dropout_full_last_p.yaml"
+python /mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/phynet/option/net_model_Dropout/train_net_model_Dropout_p.py --opt $CONFIG_FILE
+
+# CONFIG_FILE="/mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/phynet/option/net_model_GroupNorm/net_model_GroupNorm_group.yaml"
+# python /mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/phynet/option/net_model_GroupNorm/train_net_model_GroupNorm_group.py --opt $CONFIG_FILE

@@ -1,5 +1,5 @@
-target: '将网络里的卷积层进行了加深'
-exp_name: 'net_model_Dropout'
+target: 'group不同的分组数'
+exp_name: 'net_model_GroupNorm/net_model_GroupNorm_group'
 
 device: 'cuda'
 
@@ -10,10 +10,10 @@ image_name: 'ref_pi_01_prop_pi'
 seed: 1
 batch_size: 1
 lr: 0.0001
-epochs: 80000
+epochs: 30000
 
 model:
-  name: 'net_model_Dropout'
+  name: 'net_model_GroupNorm'
 
 
 
@@ -22,3 +22,4 @@ model:
 # dy = dx
 # lam = 532e-9
 dist: 0.01
+loops: [1,2,4,8,16,32]

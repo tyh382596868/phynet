@@ -54,7 +54,7 @@ class conv_block(torch.nn.Module):
 
 class net_model_Dropout_full(torch.nn.Module):
     
-    def __init__(self):
+    def __init__(self,drop=0.1):
         
         super(net_model_Dropout_full, self).__init__()
         
@@ -161,7 +161,7 @@ class net_model_Dropout_full(torch.nn.Module):
         
         self.layer_10 = torch.nn.Sequential(
             torch.nn.Conv2d(32, 1, (3, 3), stride = (1, 1), padding = 1),
-            torch.nn.Dropout(0.1),
+            torch.nn.Dropout(drop),
             # torch.nn.LeakyReLU()
             my_Sigmoid()
             )

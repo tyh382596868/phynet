@@ -54,7 +54,7 @@ class conv_block(torch.nn.Module):
 
 class net_model_Dropout(torch.nn.Module):
     
-    def __init__(self):
+    def __init__(self,drop=0.1):
         
         super(net_model_Dropout, self).__init__()
         
@@ -161,7 +161,7 @@ class net_model_Dropout(torch.nn.Module):
         
         self.layer_10 = torch.nn.Sequential(
             torch.nn.Conv2d(32, 1, (3, 3), stride = (1, 1), padding = 1),
-            torch.nn.Dropout(0.1),
+            torch.nn.Dropout(drop),
             # torch.nn.LeakyReLU()
             my_Sigmoid()
             )
@@ -227,7 +227,7 @@ if __name__=='__main__':
     #         conv_block(in_channels=32,out_channels=32)
     #         )
     #net =  conv_block(in_channels=1,out_channels=16)
-    net = net_model_Dropout()
+    net = net_model_Dropout(drop=0.5)
     y = net(x)
     print(y.shape)
     print(net)

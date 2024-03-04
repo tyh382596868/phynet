@@ -25,24 +25,24 @@ class my_Sigmoid(torch.nn.Module):
         return torch.sigmoid(input)*torch.pi        
 
 class conv_block(torch.nn.Module):
-    def __init__(self,in_channels,out_channels):
+    def __init__(self,in_channels,out_channels,group=1):
         super(conv_block,self).__init__()
 
         self.layer = torch.nn.Sequential(
             torch.nn.Conv2d(in_channels, out_channels, (3, 3), stride = (1, 1), padding = 1),
-            torch.nn.GroupNorm(1,out_channels),
+            torch.nn.GroupNorm(group,out_channels),
             torch.nn.LeakyReLU(),
             
             torch.nn.Conv2d(out_channels, out_channels, (3, 3), stride = (1, 1), padding = 1),
-            torch.nn.GroupNorm(1,out_channels),
+            torch.nn.GroupNorm(group,out_channels),
             torch.nn.LeakyReLU(),
 
             torch.nn.Conv2d(out_channels, out_channels, (3, 3), stride = (1, 1), padding = 1),
-            torch.nn.GroupNorm(1,out_channels),
+            torch.nn.GroupNorm(group,out_channels),
             torch.nn.LeakyReLU(),
 
             torch.nn.Conv2d(out_channels, out_channels, (3, 3), stride = (1, 1), padding = 1),
-            torch.nn.GroupNorm(1,out_channels),
+            torch.nn.GroupNorm(group,out_channels),
             torch.nn.LeakyReLU()
             )
 
@@ -54,7 +54,7 @@ class conv_block(torch.nn.Module):
 
 class net_model_GroupNorm(torch.nn.Module):
     
-    def __init__(self):
+    def __init__(self,group=1):
         
         super(net_model_GroupNorm, self).__init__()
         
@@ -62,38 +62,38 @@ class net_model_GroupNorm(torch.nn.Module):
             torch.nn.ConvTranspose2d(
                 1, 32, (3, 3), stride = (1, 1), padding = 1
                 ),
-            torch.nn.GroupNorm(1,32),
+            torch.nn.GroupNorm(group,32),
             torch.nn.LeakyReLU(),
             
-            conv_block(in_channels=32,out_channels=32)
+            conv_block(in_channels=32,out_channels=32,group=group)
             )
         
         self.layer_01_maxpool = torch.nn.MaxPool2d(
             kernel_size = (2, 2), stride = (2, 2)
             )
         
-        self.layer_02 = conv_block(in_channels=32,out_channels=64)
+        self.layer_02 = conv_block(in_channels=32,out_channels=64,group=group)
 
         
         self.layer_02_maxpool = torch.nn.MaxPool2d(
             kernel_size = (2, 2), stride = (2, 2)
             )
         
-        self.layer_03 = conv_block(in_channels=64,out_channels=128)
+        self.layer_03 = conv_block(in_channels=64,out_channels=128,group=group)
 
         
         self.layer_03_maxpool = torch.nn.MaxPool2d(
             kernel_size = (2, 2), stride = (2, 2)
             )
         
-        self.layer_04 = conv_block(in_channels=128,out_channels=256)
+        self.layer_04 = conv_block(in_channels=128,out_channels=256,group=group)
 
         
         self.layer_04_maxpool = torch.nn.MaxPool2d(
             kernel_size = (2, 2), stride = (2, 2)
             )
         
-        self.layer_05 = conv_block(in_channels=256,out_channels=512)
+        self.layer_05 = conv_block(in_channels=256,out_channels=512,group=group)
         
         self.layer_part1 = torch.nn.Sequential(
             self.layer_01, self.layer_01_maxpool, 
@@ -111,11 +111,11 @@ class net_model_GroupNorm(torch.nn.Module):
                 512, 256, (3, 3), stride = (2, 2), padding = 1, 
                 output_padding = 1
                 ),
-            torch.nn.GroupNorm(1,256),
+            torch.nn.GroupNorm(group,256),
             torch.nn.LeakyReLU()
             )
             
-        self.layer_06_02 = conv_block(in_channels=512,out_channels=256)
+        self.layer_06_02 = conv_block(in_channels=512,out_channels=256,group=group)
 
         
         # layer_07
@@ -125,11 +125,11 @@ class net_model_GroupNorm(torch.nn.Module):
                 256, 128, (3, 3), stride = (2, 2), padding = 1, 
                 output_padding = 1
                 ),
-            torch.nn.GroupNorm(1,128),
+            torch.nn.GroupNorm(group,128),
             torch.nn.LeakyReLU()
             )
             
-        self.layer_07_02 = conv_block(in_channels=256,out_channels=128)
+        self.layer_07_02 = conv_block(in_channels=256,out_channels=128,group=group)
         
         # layer_08
         
@@ -138,11 +138,11 @@ class net_model_GroupNorm(torch.nn.Module):
                 128, 64, (3, 3), stride = (2, 2), padding = 1, 
                 output_padding = 1
                 ),
-            torch.nn.GroupNorm(1,64),
+            torch.nn.GroupNorm(group,64),
             torch.nn.LeakyReLU()
             )
             
-        self.layer_08_02 = conv_block(in_channels=128,out_channels=64)
+        self.layer_08_02 = conv_block(in_channels=128,out_channels=64,group=group)
         
         # layer_09
         
@@ -151,11 +151,11 @@ class net_model_GroupNorm(torch.nn.Module):
                 64, 32, (3, 3), stride = (2, 2), padding = 1, 
                 output_padding = 1
                 ),
-            torch.nn.GroupNorm(1,32),
+            torch.nn.GroupNorm(group,32),
             torch.nn.LeakyReLU()
             )
             
-        self.layer_09_02 = conv_block(in_channels=64,out_channels=32)
+        self.layer_09_02 = conv_block(in_channels=64,out_channels=32,group=group)
         
         # layer_10
         
@@ -227,7 +227,7 @@ if __name__=='__main__':
     #         conv_block(in_channels=32,out_channels=32)
     #         )
     #net =  conv_block(in_channels=1,out_channels=16)
-    net = net_model_GroupNorm()
+    net = net_model_GroupNorm(group=8)
     y = net(x)
     print(y.shape)
     print(net)
