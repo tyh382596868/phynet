@@ -12,11 +12,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from library import (my_readtxt,mkdir,visual_data,prop,my_saveimage,my_savetxt)
-# from unet import net_model_v1
-from unetgood import UnetGenerator
-from baseunet import UnetGeneratorDouble,UNet
 
-from loss import TVLoss
 from dataset import measured_y_txt_dataset256,measured_y_txt_dataset256_fast
 
 import torch
@@ -26,6 +22,9 @@ from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 import argparse
 from config.parameter import Parameter,import_class
+
+import os
+os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'max_split_size_mb=128'
 
     
 
@@ -60,7 +59,7 @@ if __name__ == "__main__":
     gt_matrix = my_readtxt(gt_txt)
     print(gt_matrix.dtype)
 
-    result_folder = f'/mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/result/{name}/{localtime}'
+    result_folder = f'/mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/result/{para.exp_name}/{name}/{localtime}'
     tb_folder = f'{result_folder}/tb_folder'
 
     weight_folder = f"{result_folder}/weight_folder"
@@ -104,7 +103,7 @@ if __name__ == "__main__":
     # 3.model
     # print(para.model['name'])
     model_name = para.model['name']
-    modelnet = import_class(model_name,model_name)  
+    modelnet = import_class('arch.'+model_name,model_name)  
     net  =  modelnet().to(device)
     print('creating model')
     
@@ -196,9 +195,9 @@ if __name__ == "__main__":
                         my_saveimage(gt_matrix-((pred_y).cpu().detach().numpy().reshape(shape[0],shape[1])),f'{img_txt_folder}/{step}_gt-_pred.png')
                         my_savetxt(gt_matrix-((pred_y).cpu().detach().numpy().reshape(shape[0],shape[1])),f'{img_txt_folder}/{step}_gt-_pred.txt')
 
-            # if step % 40 == 0:
-            #     # 80的时候显存差不多满了
-            #     torch.cuda.empty_cache()
+            if step % 40 == 0:
+                # 80的时候显存差不多满了
+                torch.cuda.empty_cache()
             
     print("Done!")
 

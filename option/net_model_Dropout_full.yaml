@@ -1,0 +1,24 @@
+target: '将网络里的卷积层进行了加深'
+exp_name: 'net_model_Dropout_full'
+
+device: 'cuda'
+
+image_width: 1536
+image_height: 1536
+image_name: 'ref_pi_01_prop_pi'
+
+seed: 1
+batch_size: 1
+lr: 0.0001
+epochs: 160000
+
+model:
+  name: 'net_model_Dropout_full'
+
+
+
+# # prop的默认参数
+# dx = 2.2e-6
+# dy = dx
+# lam = 532e-9
+dist: 0.01
