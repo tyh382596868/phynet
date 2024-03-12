@@ -352,6 +352,11 @@ def sam_ref(sam,ref):
     diff = signal.medfilt(diff,(7,7)) #二维中值滤波    
     return diff
 
+def sam_ref_2pi(sam,ref):
+    diff = (sam - ref + 4.1)%(np.pi*2)
+    diff = signal.medfilt(diff,(11,11)) #二维中值滤波    
+    return diff
+
 if __name__=='__main__':
 
     # cmaps = ['viridis', 'plasma', 'inferno', 'magma', 'cividis','Greys', 'Purples', 'Blues', 'Greens', 'Oranges', 'Reds',
