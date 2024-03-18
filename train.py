@@ -5,6 +5,7 @@
 
 import os
 
+# os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'max_split_size_mb=128'
 # os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:32"
 import math
 import time
@@ -12,8 +13,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from library import (my_readtxt,mkdir,visual_data,prop,my_saveimage,my_savetxt)
-
 from dataset import measured_y_txt_dataset256,measured_y_txt_dataset256_fast
+from config.parameter import Parameter,import_class
+from trainer.trainer import train_epoch
 
 import torch
 import torchvision
@@ -21,16 +23,9 @@ from torch.utils.tensorboard import SummaryWriter
 
 from tqdm import tqdm
 import argparse
-from config.parameter import Parameter,import_class
-
-import os
-os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'max_split_size_mb=128'
-
-    
 
 
-#------------------------------------------------------------------------------
-# main
+
 
 if __name__ == "__main__":
 
@@ -41,7 +36,7 @@ if __name__ == "__main__":
 
 
     shape = [para.image_width,para.image_height]
-    # print(shape)
+ 
 
     # 1.实验名称
     
@@ -111,7 +106,7 @@ if __name__ == "__main__":
     # 4.loss and optimization
     loss_mse = torch.nn.MSELoss()
     optimizer = torch.optim.Adam(net.parameters(), lr = lr)
-    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=200, gamma=0.999)
+    # scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=200, gamma=0.999)
     print('creating loss and optimization')
 
     # 记录训练开始前的超参数，网络结构，输入强度图，gt图像
@@ -129,77 +124,83 @@ if __name__ == "__main__":
     
     # 5.training
     print('starting loop')
+    
+
+    
+    
  
     for current_epoch in tqdm(range(epochs)):
         # print(f"Epoch {current_epoch}\n-------------------------------")
+        
+        train_epoch(train_dataloader,net,loss_mse,optimizer,prop,para,current_epoch)
 
-        for batch,(x,y) in (enumerate(train_dataloader)):
+        # for batch,(x,y) in (enumerate(train_dataloader)):
             
-            optimizer.zero_grad()
-            pred_y = net(x)
-            
-
-
-            measured_y = prop(pred_y[0, 0, :, :],dist=para.dist)
-            loss_mse_value = loss_mse(y.float(),measured_y.float())
-            loss_value =  loss_mse_value
-
-            # backward proapation
-
-            loss_value.backward()
-            optimizer.step()
-            
-            scheduler.step()
-
+        #     optimizer.zero_grad()
+        #     pred_y = net(x)
             
 
-            # 实验记录
 
-            step = current_epoch * len(train_dataloader) + batch
+        #     measured_y = prop(pred_y[0, 0, :, :],dist=para.dist)
+        #     loss_mse_value = loss_mse(y.float(),measured_y.float())
+        #     loss_value =  loss_mse_value
 
-            # 记录loss
-            if step % 50 == 0:
-                # tb记录loss
-                writer.add_scalar('training loss',
-                                loss_value.item(),
-                                step)
-                
-                phase_diff = np.abs(gt_matrix-((pred_y).cpu().detach().numpy().reshape(shape[0],shape[1])))
+           
 
-                writer.add_scalar('相位差',
-                                np.mean(phase_diff),
-                                step)
-                last_lr = scheduler.get_last_lr()[-1]
-                writer.add_scalar('lr',
-                                last_lr,
-                                step)
-                
-                
-                # 记录最好的模型权重
-                # 保存loss值最小的网络参数
-                if loss_value < best_loss:
-                    best_loss = loss_value
-                    torch.save(net.state_dict(), f"{weight_folder}/best_model.pth")
-
-            # 记录中间结果图片
-            if step % 500 == 0:
-                        my_saveimage(pred_y.cpu().detach().numpy().reshape(shape[0],shape[1]),f'{img_txt_folder}/{step}_pred.png')
-                        my_savetxt(pred_y.cpu().detach().numpy().reshape(shape[0],shape[1]),f'{img_txt_folder}/{step}_pred.txt')
-
-                        my_saveimage(measured_y.cpu().detach().numpy().reshape(shape[0],shape[1]),f'{img_txt_folder}/{step}_measured_y.png')
-                        my_savetxt(measured_y.cpu().detach().numpy().reshape(shape[0],shape[1]),f'{img_txt_folder}/{step}_measured_y.txt')
-
-                        my_saveimage((x-measured_y).cpu().detach().numpy().reshape(shape[0],shape[1]),f'{img_txt_folder}/{step}_{name}-measured_y.png')
-                        my_savetxt((x-measured_y).cpu().detach().numpy().reshape(shape[0],shape[1]),f'{img_txt_folder}/{step}_{name}-measured_y.txt')
-                        
-                        my_saveimage(gt_matrix-((pred_y).cpu().detach().numpy().reshape(shape[0],shape[1])),f'{img_txt_folder}/{step}_gt-_pred.png')
-                        my_savetxt(gt_matrix-((pred_y).cpu().detach().numpy().reshape(shape[0],shape[1])),f'{img_txt_folder}/{step}_gt-_pred.txt')
-
-            if step % 40 == 0:
-                # 80的时候显存差不多满了
-                torch.cuda.empty_cache()
+        #     loss_value.backward()
+        #     optimizer.step()
             
-    print("Done!")
+            
+
+            
+
+        # 实验记录
+
+        step = current_epoch * len(train_dataloader) + 1
+
+    #     # 记录loss
+    #     if step % 50 == 0:
+    #         # tb记录loss
+    #         writer.add_scalar('training loss',
+    #                         loss_value.item(),
+    #                         step)
+            
+    #         phase_diff = np.abs(gt_matrix-((pred_y).cpu().detach().numpy().reshape(shape[0],shape[1])))
+
+    #         writer.add_scalar('相位差',
+    #                         np.mean(phase_diff),
+    #                         step)
+    #         # last_lr = scheduler.get_last_lr()[-1]
+    #         # writer.add_scalar('lr',
+    #         #                 last_lr,
+    #         #                 step)
+            
+            
+    #         # 记录最好的模型权重
+    #         # 保存loss值最小的网络参数
+    #         if loss_value < best_loss:
+    #             best_loss = loss_value
+    #             torch.save(net.state_dict(), f"{weight_folder}/best_model.pth")
+
+    #     # 记录中间结果图片
+    #     if step % 500 == 0:
+    #                 my_saveimage(pred_y.cpu().detach().numpy().reshape(shape[0],shape[1]),f'{img_txt_folder}/{step}_pred.png')
+    #                 my_savetxt(pred_y.cpu().detach().numpy().reshape(shape[0],shape[1]),f'{img_txt_folder}/{step}_pred.txt')
+
+    #                 my_saveimage(measured_y.cpu().detach().numpy().reshape(shape[0],shape[1]),f'{img_txt_folder}/{step}_measured_y.png')
+    #                 my_savetxt(measured_y.cpu().detach().numpy().reshape(shape[0],shape[1]),f'{img_txt_folder}/{step}_measured_y.txt')
+
+    #                 my_saveimage((x-measured_y).cpu().detach().numpy().reshape(shape[0],shape[1]),f'{img_txt_folder}/{step}_{name}-measured_y.png')
+    #                 my_savetxt((x-measured_y).cpu().detach().numpy().reshape(shape[0],shape[1]),f'{img_txt_folder}/{step}_{name}-measured_y.txt')
+                    
+    #                 my_saveimage(gt_matrix-((pred_y).cpu().detach().numpy().reshape(shape[0],shape[1])),f'{img_txt_folder}/{step}_gt-_pred.png')
+    #                 my_savetxt(gt_matrix-((pred_y).cpu().detach().numpy().reshape(shape[0],shape[1])),f'{img_txt_folder}/{step}_gt-_pred.txt')
+
+    #     if step % 40 == 0:
+    #         # 80的时候显存差不多满了
+    #         torch.cuda.empty_cache()
+            
+    # print("Done!")
 
 
 

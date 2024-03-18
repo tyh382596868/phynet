@@ -4,30 +4,6 @@ from torch.nn import init
 import functools
 from torch.optim import lr_scheduler
 
-# class my_Tanh(nn.Module):
-#     r"""Applies the Hyperbolic Tangent (Tanh) function element-wise.
-
-#     Tanh is defined as:
-
-#     .. math::
-#         \text{Tanh}(x) = \tanh(x) = \frac{\exp(x) - \exp(-x)} {\exp(x) + \exp(-x)}
-
-#     Shape:
-#         - Input: :math:`(*)`, where :math:`*` means any number of dimensions.
-#         - Output: :math:`(*)`, same shape as the input.
-
-#     .. image:: ../scripts/activation_images/Tanh.png
-
-#     Examples::
-
-#         >>> m = nn.Tanh()
-#         >>> input = torch.randn(2)
-#         >>> output = m(input)
-#     """
-
-#     def forward(self, input: torch.Tensor) -> torch.Tensor:
-#         return torch.tanh(input)*torch.pi
-
 class my_Sigmoid(torch.nn.Module):
     r"""Applies the element-wise function:
 

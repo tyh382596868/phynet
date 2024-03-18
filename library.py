@@ -286,20 +286,8 @@ def prop(img,  dx=2.2e-6, dy=2.2e-6, lam=532e-9, dist=0.0788,device='cuda:0'):
     # print(torch.max(img_phase))
     
     H = torch.exp(1j * img_phase) 
-    fft_H = torch.fft.ifftshift(torch.fft.fft2(H))
-    # H = torch.exp(1j * img) 
-    # (Ny,Nx) = H.size()
-    # fft_H = torch.fft.ifftshift(torch.fft.fft2(H)).to(device)
-    # the axis in frequency space
-    # qx = torch.linspace(0.25/xstart, 0.25/xend, nx) * nx
-    # qy = torch.linspace(0.25/ystart, 0.25/yend, ny) * ny
-    
-    # qx = torch.range(1-Nx/2, Nx/2, 1).to(device)
-    # qy = torch.range(1-Ny/2, Ny/2, 1).to(device)
-    # # print(qx)
-    # y, x = torch.meshgrid(qx, qy)
-    # # print(f'mesh_qx{mesh_qx}')
-    # # print(f'mesh_qy{mesh_qy}')
+    fft_H = torch.fft.fftshift(torch.fft.fft2(H))
+
     (Ny,Nx) = H.shape[0],H.shape[1]
     
     qx = torch.range(1-Nx/2, Nx/2, 1).to(device)
@@ -354,8 +342,13 @@ def sam_ref(sam,ref):
 
 def sam_ref_2pi(sam,ref):
     diff = (sam - ref + 4.1)%(np.pi*2)
+    # diff = (sam - ref)%(np.pi*2)
     diff = signal.medfilt(diff,(11,11)) #二维中值滤波    
     return diff
+
+       
+
+
 
 if __name__=='__main__':
 
