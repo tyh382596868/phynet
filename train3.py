@@ -14,7 +14,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from library import (my_readtxt,mkdir,visual_data,prop,my_saveimage,my_savetxt)
-from dataset import measured_y_txt_dataset256,measured_y_txt_dataset256_fast
+from dataset import mydataset
 from config.parameter import Parameter,import_class
 from trainer.trainer import train_epoch
 
@@ -236,7 +236,9 @@ if __name__ == "__main__":
                     hypar_file.write(f'batch_size {batch_size}\n')
                     hypar_file.write(f'lr {lr}\n')
                     hypar_file.write(f'epochs {epochs}\n')
+                    hypar_file.write(f'network\n{loss_mse}\n')
                     hypar_file.write(f'network\n{net}\n')
+                    
                     hypar_file.close()                    
 
                     # tensorboard
@@ -251,63 +253,63 @@ if __name__ == "__main__":
                     for current_epoch in tqdm(range(epochs)):
                         # print(f"Epoch {current_epoch}\n-------------------------------")
 
-                        for batch,(x,y) in (enumerate(train_dataloader)):
+                        # for batch,(x,y) in (enumerate(train_dataloader)):
                             
-                            optimizer.zero_grad()
-                            # forward proapation
-                            pred_y = net(x) 
+                        #     optimizer.zero_grad()
+                        #     # forward proapation
+                        #     pred_y = net(x) 
                             
-                            flattened_pred_y = pred_y[0, 0, :, :]      
-                            measured_y = prop(flattened_pred_y,dist=para.dist)
-                            loss_mse_value = loss_mse(y.float(),measured_y.float())
-                            loss_value =  loss_mse_value
+                        #     flattened_pred_y = pred_y[0, 0, :, :]      
+                        #     measured_y = prop(flattened_pred_y,dist=para.dist)
+                        #     loss_mse_value = loss_mse(y.float(),measured_y.float())
+                        #     loss_value =  loss_mse_value
 
-                            # backward proapation
-                            loss_value.backward()
+                        #     # backward proapation
+                        #     loss_value.backward()
                             
-                            optimizer.step()   
+                        #     optimizer.step()   
                                                                                  
-                            # 实验记录
+                        # 实验记录
+                        flattened_pred_y,measured_y,loss_value = train_epoch(train_dataloader,net,loss_mse,optimizer)
+                        step = current_epoch 
+                        experiment_losses.append(loss_value.item())
+                        # 记录loss
+                        if step % 50 == 0:
+                            # tb记录loss
+                            writer.add_scalar('training loss',
+                                            loss_value.item(),
+                                            step)
+                            
+                            phase_diff = np.abs(cropped_pha-((flattened_pred_y).cpu().detach().numpy()))
 
-                            step = current_epoch 
-                            experiment_losses.append(loss_value.item())
-                            # 记录loss
-                            if step % 50 == 0:
-                                # tb记录loss
-                                writer.add_scalar('training loss',
-                                                loss_value.item(),
-                                                step)
-                                
-                                phase_diff = np.abs(cropped_pha-((flattened_pred_y).cpu().detach().numpy()))
+                            writer.add_scalar('相位差',
+                                            np.mean(phase_diff),
+                                            step)
+                            
+                            
+                            # 记录最好的模型权重
+                            # 保存loss值最小的网络参数
+                            if loss_value < best_loss:
+                                best_loss = loss_value
+                                torch.save(net.state_dict(), f"{weight_folderimg}/best_model.pth")
 
-                                writer.add_scalar('相位差',
-                                                np.mean(phase_diff),
-                                                step)
-                                
-                                
-                                # 记录最好的模型权重
-                                # 保存loss值最小的网络参数
-                                if loss_value < best_loss:
-                                    best_loss = loss_value
-                                    torch.save(net.state_dict(), f"{weight_folderimg}/best_model.pth")
+                        # 记录中间结果图片
+                        if step % 3000 == 0:
+                                    my_saveimage(flattened_pred_y.cpu().detach().numpy(),f'{img_txt_folderimg}/{step}_PredPha.png')
+                                    my_savetxt(flattened_pred_y.cpu().detach().numpy(),f'{img_txt_folderimg}/{step}_PredPha.txt')
 
-                            # 记录中间结果图片
-                            if step % 3000 == 0:
-                                        my_saveimage(flattened_pred_y.cpu().detach().numpy(),f'{img_txt_folderimg}/{step}_PredPha.png')
-                                        my_savetxt(flattened_pred_y.cpu().detach().numpy(),f'{img_txt_folderimg}/{step}_PredPha.txt')
+                                    my_saveimage(measured_y.cpu().detach().numpy(),f'{img_txt_folderimg}/{step}_PredAmp.png')
+                                    my_savetxt(measured_y.cpu().detach().numpy(),f'{img_txt_folderimg}/{step}_PredAmp.txt')
 
-                                        my_saveimage(measured_y.cpu().detach().numpy(),f'{img_txt_folderimg}/{step}_PredAmp.png')
-                                        my_savetxt(measured_y.cpu().detach().numpy(),f'{img_txt_folderimg}/{step}_PredAmp.txt')
+                                    my_saveimage((cropped_amp[0,:,:]-measured_y).cpu().detach().numpy(),f'{img_txt_folderimg}/{step}_AmpLoss.png')
+                                    my_savetxt((cropped_amp[0,:,:]-measured_y).cpu().detach().numpy(),f'{img_txt_folderimg}/{step}_AmpLoss.txt')
+                                    
+                                    my_saveimage(cropped_pha-((flattened_pred_y).cpu().detach().numpy()),f'{img_txt_folderimg}/{step}_PhaLoss.png')
+                                    my_savetxt(cropped_pha-((flattened_pred_y).cpu().detach().numpy()),f'{img_txt_folderimg}/{step}_PhaLoss.txt')
 
-                                        my_saveimage((x[0, 0, :, :]-measured_y).cpu().detach().numpy(),f'{img_txt_folderimg}/{step}_AmpLoss.png')
-                                        my_savetxt((x[0, 0, :, :]-measured_y).cpu().detach().numpy(),f'{img_txt_folderimg}/{step}_AmpLoss.txt')
-                                        
-                                        my_saveimage(cropped_pha-((flattened_pred_y).cpu().detach().numpy()),f'{img_txt_folderimg}/{step}_PhaLoss.png')
-                                        my_savetxt(cropped_pha-((flattened_pred_y).cpu().detach().numpy()),f'{img_txt_folderimg}/{step}_PhaLoss.txt')
-
-                            if step % 40 == 0:
-                                # 80的时候显存差不多满了
-                                torch.cuda.empty_cache()
+                        if step % 40 == 0:
+                            # 80的时候显存差不多满了
+                            torch.cuda.empty_cache()
                         
             # 将当前实验的loss列表添加到总列表中
             all_experiment_losses.append(experiment_losses)

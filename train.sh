@@ -29,5 +29,7 @@
 # CONFIG_FILE="/mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/phynet/option/net_model_GroupNorm/net_model_GroupNorm_group.yaml"
 # python /mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/phynet/option/net_model_GroupNorm/train_net_model_GroupNorm_group.py --opt $CONFIG_FILE
 
-CONFIG_FILE="/mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/phynet/option/baseline2.yaml"
-python /mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/phynet/train2.py --opt $CONFIG_FILE
+CONFIG_FILE="/mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/phynet/option/net_model_Dropout_full_my_wraptopi.yaml"
+# CONFIG_FILE="/mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/phynet/option/baseline2.yaml"
+# python /mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/phynet/train2.py --opt $CONFIG_FILE
+python /mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/phynet/train3.py --opt $CONFIG_FILE

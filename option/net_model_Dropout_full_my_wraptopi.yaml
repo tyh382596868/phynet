@@ -14,7 +14,7 @@ lr: 0.0001
 epochs: 15000
 
 model:
-  name: 'net_model_Dropout_full'
+  name: 'net_model_Dropout_full_my_wraptopi'
   p: 0.01
 
 folder_paths: [

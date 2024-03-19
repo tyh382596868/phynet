@@ -1,6 +1,27 @@
 import torch
 import numpy as np
 
+
+class mydataset(torch.utils.data.Dataset):
+    # 从txt文件中读矩阵
+    def __init__(self,data):
+
+        self.data = data
+
+        
+    def __getitem__(self,idx):
+
+        # return x,y
+        return self.data,self.data #使数据类型和模型参数类型一样
+
+    def __len__(self):
+
+        return 1 
+
+
+
+
+
 class measured_y_txt_dataset256_fast(torch.utils.data.Dataset):
     # 从txt文件中读矩阵
     def __init__(self,data,data_shape):
