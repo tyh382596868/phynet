@@ -4,6 +4,7 @@ from torchvision import transforms
 from PIL import Image
 import copy
 from source_target_transforms import *
+from library import my_save2image
 class mydataset(torch.utils.data.Dataset):
     # 从txt文件中读矩阵
     def __init__(self,Amp,Pha,transform=None):
@@ -36,28 +37,7 @@ class mydataset(torch.utils.data.Dataset):
     
 import matplotlib.pyplot as plt
 
-def my_save2image(matrix1, matrix2, image_path, cmap='viridis'):
-    '''
-    matrix1, matrix2: float32 [H,W] - 分别代表两个要显示的图像矩阵
-    image_path: 保存图像的路径
-    cmap: 颜色映射
-    '''
 
-    plt.clf()  # 清图。
-    plt.cla()  # 清坐标轴
-    plt.figure(figsize=(12, 6))  # 设定图像大小
-
-    # 显示第一个图像
-    plt.subplot(1, 2, 1)
-    imgplot1 = plt.imshow(matrix1, cmap=cmap)
-    plt.colorbar()  # 为第一个图像添加颜色条
-
-    # 显示第二个图像
-    plt.subplot(1, 2, 2)
-    imgplot2 = plt.imshow(matrix2, cmap=cmap)
-    plt.colorbar()  # 为第二个图像添加颜色条
-
-    plt.savefig(image_path)  # 保存图像
 
 if __name__ == '__main__':
 

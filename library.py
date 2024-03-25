@@ -76,7 +76,28 @@ def my_saveimage(matrix,image_path,cmap='viridis'):
     plt.colorbar()
 
     plt.savefig(image_path)
+def my_save2image(matrix1, matrix2, image_path, cmap='viridis'):
+    '''
+    matrix1, matrix2: float32 [H,W] - 分别代表两个要显示的图像矩阵
+    image_path: 保存图像的路径
+    cmap: 颜色映射
+    '''
 
+    plt.clf()  # 清图。
+    plt.cla()  # 清坐标轴
+    plt.figure(figsize=(12, 6))  # 设定图像大小
+
+    # 显示第一个图像
+    plt.subplot(1, 2, 1)
+    imgplot1 = plt.imshow(matrix1, cmap=cmap)
+    plt.colorbar()  # 为第一个图像添加颜色条
+
+    # 显示第二个图像
+    plt.subplot(1, 2, 2)
+    imgplot2 = plt.imshow(matrix2, cmap=cmap)
+    plt.colorbar()  # 为第二个图像添加颜色条
+
+    plt.savefig(image_path)  # 保存图像
 def my_saveimage_plus(matrix,image_path):
           
     '''
@@ -273,45 +294,7 @@ def visual_data(dataloader,root_path):
 #     return intensity
 
 
-def prop(img,  dx=2.2e-6, dy=2.2e-6, lam=532e-9, dist=0.0788,device='cuda:0'):
-    '''
-    1.注意传播距离，确保生成图像的传播距离与训练的传播距离一致，一般默认一致
-    2.输入数据的维度应该为二维，如果是三维，就算值一样傅里叶变换后也不一样
-    '''
 
-    # print(torch.max(img))
-
-    img_phase = img #*torch.pi
-
-    # print(torch.max(img_phase))
-    
-    H = torch.exp(1j * img_phase) 
-    fft_H = torch.fft.fftshift(torch.fft.fft2(H))
-
-    (Ny,Nx) = H.shape[0],H.shape[1]
-    
-    qx = torch.range(1-Nx/2, Nx/2, 1).to(device)
-    qy = torch.range(1-Ny/2, Ny/2, 1).to(device)
-    y, x = torch.meshgrid(qy, qx)
-    r=(2*torch.pi*x/(dx*Nx))**2+(2*torch.pi*y/(dy*Ny))**2
-
-    k=2*torch.pi/lam
-
-    kernel=torch.exp(-1*1j*torch.sqrt(k**2-r)*dist)
-
-    fft_HH=fft_H[:,:]*kernel
-    fft_HH=torch.fft.fftshift(fft_HH)
-
-    Ud=torch.fft.ifft2(fft_HH)
-
-    Id=Ud
-    Id1=torch.angle(Ud)
-    intensity = torch.abs(Id) * torch.abs(Id)
- 
-    # print(f'torch.max(intensity){torch.max(intensity)}')
-    # print(f'intensity{intensity}')
-
-    return intensity
 
 def result_visual(pred_ref_path,pred_sam_path,gt_ref_path,gt_sam_path,save_path,cmap='viridis'):
     pred_ref = my_readtxt(pred_ref_path)
