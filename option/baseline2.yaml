@@ -1,5 +1,5 @@
 target: '换成了l1loss，同时是和x做loss不是和y'
-exp_name: 'net_model_Dropout_full'
+exp_name: 'test'
 
 device: 'cuda'
 
