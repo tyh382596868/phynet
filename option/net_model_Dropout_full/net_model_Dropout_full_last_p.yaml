@@ -1,0 +1,30 @@
+target: '对于所有的BN换成dropout，最后一层丢弃率多少合适'
+exp_name: 'net_model_Dropout_full/net_model_Dropout_full_last_p'
+
+device: 'cuda'
+
+image_width: 1536
+image_height: 1536
+image_name: 'sam_pi_01_prop_pi'
+# 'ref_pi_01_prop_pi'
+
+seed: 1
+batch_size: 1
+lr: 0.0001
+epochs: 160000
+
+model:
+  name: 'net_model_Dropout_full'
+  p: 0.01
+
+
+
+# # prop的默认参数
+# dx = 2.2e-6
+# dy = dx
+# lam = 532e-9
+dist: 0.01
+
+# loops: [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9]
+# loops: [0.08,0.05,0.03,0.01,0.001,0.0001]
+loops: [0.01]

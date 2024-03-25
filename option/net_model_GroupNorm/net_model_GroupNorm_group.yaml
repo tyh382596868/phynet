@@ -1,0 +1,25 @@
+target: 'group不同的分组数'
+exp_name: 'net_model_GroupNorm/net_model_GroupNorm_group'
+
+device: 'cuda'
+
+image_width: 1536
+image_height: 1536
+image_name: 'ref_pi_01_prop_pi'
+
+seed: 1
+batch_size: 1
+lr: 0.0001
+epochs: 30000
+
+model:
+  name: 'net_model_GroupNorm'
+
+
+
+# # prop的默认参数
+# dx = 2.2e-6
+# dy = dx
+# lam = 532e-9
+dist: 0.01
+loops: [1,2,4,8,16,32]
