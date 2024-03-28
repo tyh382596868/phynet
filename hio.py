@@ -5,13 +5,33 @@ import torch
 from tqdm import tqdm
 import scipy.io as scio 
 import cv2
+from prop import prop
 
 import numpy as np
 ## Reconstruct the phase of the sample
 
-from prop import prop
 
 
+def PaddingImage(img,original_width,original_height,target_width, target_height):
+    """Pad the image with zeros to expand to a fixed size.
+
+    Args:
+        img (_type_): input little image
+        original_width (_type_): width of original image
+        original_height (_type_): height of original image
+        target_width (_type_): width of target image
+        target_height (_type_): height of target image
+
+    Returns:
+        extended_image: Image after pixel padding
+    """    
+
+    x_padding = target_width - original_width
+    y_padding = target_height - original_height
+    # 使用copyMakeBorder函数在原始图片的周围添加像素
+    # blk_constant参数指定添加的像素颜色，这里是0（黑色）
+    extended_image = cv2.copyMakeBorder(img, y_padding//2, y_padding//2, x_padding//2, x_padding//2, cv2.BORDER_CONSTANT, value=0)
+    return extended_image   
 
 
 ispadding = 'False' # 图片是否扩充
