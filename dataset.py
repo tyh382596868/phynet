@@ -5,31 +5,32 @@ from PIL import Image
 import copy
 from source_target_transforms import *
 from library import my_save2image
+
 class mydataset(torch.utils.data.Dataset):
     # 从txt文件中读矩阵
-    def __init__(self,Amp,Pha,transform=None):
+    def __init__(self,speckle,Pha,transform=None):
 
-        self.Amp = (Amp)      
+        self.speckle = (speckle)      
         self.Pha = (Pha)
         self.transform = transform
 
         
     def __getitem__(self,idx):
 
-        self.Amp_copy = copy.deepcopy(self.Amp)
+        self.speckle_copy = copy.deepcopy(self.speckle)
         self.Pha_copy = copy.deepcopy(self.Pha)
-        print(self.Amp_copy.shape,self.Pha_copy.shape)
+        # print(self.speckle_copy.shape,self.Pha_copy.shape)
         
         if self.transform is not None:
             
-            self.Amp_copy = Image.fromarray(self.Amp_copy)
+            self.speckle_copy = Image.fromarray(self.speckle_copy)
             self.Pha_copy = Image.fromarray(self.Pha_copy)  
             # print(self.Amp_copy.shape,self.Pha_copy.shape)      
                 
-            self.Amp_copy, self.Pha_copy = self.transform((self.Amp_copy, self.Pha_copy))
-            print(self.Amp_copy.shape,self.Pha_copy.shape)
+            self.speckle_copy, self.Pha_copy = self.transform((self.speckle_copy, self.Pha_copy))
+            # print(self.speckle_copy.shape,self.Pha_copy.shape)
         
-        return self.Amp_copy,self.Pha_copy #使数据类型和模型参数类型一样
+        return self.speckle_copy,self.Pha_copy #使数据类型和模型参数类型一样
 
     def __len__(self):
 

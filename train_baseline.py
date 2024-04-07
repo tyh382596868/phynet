@@ -16,7 +16,7 @@ from prop import prop
 from library import (my_readtxt,mkdir,visual_data,my_saveimage,my_savetxt)
 from dataset import measured_y_txt_dataset256,measured_y_txt_dataset256_fast
 from config.parameter import Parameter,import_class
-from trainer.trainer import train_epoch
+
 
 import torch
 import torchvision

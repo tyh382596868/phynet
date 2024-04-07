@@ -1,0 +1,31 @@
+target: ''
+exp_name: 'test'
+
+num: 1000
+scale: 'pi'
+dist: 0.0788
+image_height: 1024
+image_width: 1024
+
+
+device: 'cuda:1'
+seed: 1
+batch_size: 1
+lr: 0.0001
+epochs: 10000
+
+model:
+  name: 'net_model_Dropout_full'
+  p: 0.01
+
+
+loss:
+  name: 'MSELoss'
+
+
+
+  # 'L1Loss'        
+# # prop的默认参数
+# dx = 2.2e-6
+# dy = dx
+# lam = 532e-9
