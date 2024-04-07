@@ -1,12 +1,12 @@
 target: ''
 exp_name: 'test'
 
-num: 1000
+num: 10
 scale: 'pi'
 dist: 0.0788
-image_height: 1024
-image_width: 1024
-
+image_height: 1920
+image_width: 1920
+constraint: 'strong'
 
 device: 'cuda:1'
 seed: 1

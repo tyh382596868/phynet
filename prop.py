@@ -1,7 +1,7 @@
 import torch
 
 
-def prop(img,  dx=2.2e-6, dy=2.2e-6, lam=532e-9, dist=0.0788,device='cuda:0'):
+def prop(img,  dx=2e-6, dy=2e-6, lam=532e-9, dist=0.0788,device='cuda:0'):
     '''
     1.注意传播距离，确保生成图像的传播距离与训练的传播距离一致，一般默认一致
     2.输入数据的维度应该为二维，如果是三维，就算值一样傅里叶变换后也不一样
@@ -41,7 +41,7 @@ def prop(img,  dx=2.2e-6, dy=2.2e-6, lam=532e-9, dist=0.0788,device='cuda:0'):
 
     return intensity
 
-def propcomplex(H, dx=2.2e-6, dy=2.2e-6, lam=532e-9, dist=0.0788,device='cuda:0'):
+def propcomplex(H, dx=2e-6, dy=2e-6, lam=532e-9, dist=0.0788,device='cuda:0'):
     """Angular Spectrum Method for Light Field Propagation Function
 
     Args:
