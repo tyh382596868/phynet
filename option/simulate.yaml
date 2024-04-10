@@ -1,18 +1,18 @@
 target: ''
 exp_name: 'test'
 
-num: 100
+num: 3000
 scale: '2pi'
 dist: 0.6
 # image_height: 3000
 # image_width: 3000
-constraint: 'weak'
+constraint: 'strong'
 # 'strong'
 # 'weak'
 #'strong'
 resize:
   flag: True
-  size: 256
+  size: 1280
 fi: 4
 device: 'cuda'
 seed: 1

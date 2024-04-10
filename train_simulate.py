@@ -338,7 +338,7 @@ if __name__=="__main__":
                     torch.save(net.state_dict(), f"{weight_folder}/best_model.pth")
 
             # 记录中间结果图片
-            if step % 3000 == 0:
+            if step % 300 == 0:
                         dpi = 800
                         my_saveimage(flattened_pred_pha.cpu().detach().numpy(),f'{img_txt_folder}/{step}_PredPha.png',dpi=dpi)
                         my_savetxt(flattened_pred_pha.cpu().detach().numpy(),f'{img_txt_folder}/{step}_PredPha.txt')
