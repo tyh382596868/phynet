@@ -25,57 +25,52 @@ def my_readimage(image_path):
     读入图片:[0-255]array(256, 256, 3) ->[0,1]tensor torch.Size([1, 256, 256])
     '''
     imgcv = cv2.imread(image_path)
-    # print(f'shape of image:{imgcv.shape}')
-    # print(f'type of image:{imgcv.dtype}')
-    # print(f'max of image:{imgcv.max()}')
     transform = transforms.Compose([
     transforms.ToTensor()
-])
-    
+])    
     imgcv = cv2.cvtColor(imgcv, cv2.COLOR_BGR2GRAY) #三通道转换为单通道
-    # print(f'shape of image:{imgcv.shape}')
-    # print(f'type of image:{imgcv.dtype}')
-    # print(f'max of image:{imgcv.max()}')
     imgcvb = transform(imgcv) #将一个取值范围在[0,255]的numpy.ndarray图像转换为[0,1.0]的torch.FloadTensor图像，同时各维度的顺序也将自动调整。
-    # print(f'shape of image:{imgcvb.shape}')
-    # print(f'type of image:{imgcvb.dtype}')
-    # print(f'max of image:{imgcvb.max()}')
+
     return imgcvb
 
-def my_saveimage(matrix,image_path,cmap='viridis'):
+def my_saveimage(matrix,image_path,cmap='viridis',dpi=200):
           
     '''
     matrix:float32 [H,W]
     '''
-    # plt.clf() # 清图。
-    # plt.cla() # 清坐标轴
-
-    # # print(f'shape of measured_y:{matrix.shape}')
-    # # print(f'type of measured_y:{matrix.dtype}')
-    # # print(f'max of measured_y:{matrix.max()}')
-    # ax = plt.subplot()
-
-    # im = ax.imshow(matrix,resample=True)
-
-    # # create an Axes on the right side of ax. The width of cax will be 5%
-    # # of ax and the padding between cax and ax will be fixed at 0.05 inch.
-    # divider = make_axes_locatable(ax)
-    # cax = divider.append_axes("right", size="5%", pad=0.05)
-
-    # plt.colorbar(im, cax=cax)
-    # plt.savefig(image_path)
 
     plt.clf() # 清图。
     plt.cla() # 清坐标轴
 
-    # cmap1 = copy.copy(mpl.cm.viridis)
-    # norm1 = mpl.colors.Normalize(vmin=0, vmax=100)
-    # im1 = mpl.cm.ScalarMappable(norm=norm1, cmap=cmap1)
-    # ax = plt.subplot()
+    plt.figure(figsize=(6, 6))
     imgplot = plt.imshow(matrix,cmap=cmap)
     plt.colorbar()
+    plt.savefig(image_path,dpi=dpi)
 
-    plt.savefig(image_path)
+
+def my_save2image(matrix1, matrix2, image_path, cmap='viridis'):
+    '''
+    matrix1, matrix2: float32 [H,W] - 分别代表两个要显示的图像矩阵
+    image_path: 保存图像的路径
+    cmap: 颜色映射
+    '''
+
+    plt.clf()  # 清图。
+    plt.cla()  # 清坐标轴
+    plt.figure(figsize=(12, 6))  # 设定图像大小
+
+    # 显示第一个图像
+    plt.subplot(1, 2, 1)
+    imgplot1 = plt.imshow(matrix1, cmap=cmap)
+    plt.colorbar()  # 为第一个图像添加颜色条
+
+    # 显示第二个图像
+    plt.subplot(1, 2, 2)
+    imgplot2 = plt.imshow(matrix2, cmap=cmap)
+    plt.colorbar()  # 为第二个图像添加颜色条
+
+    plt.savefig(image_path)  # 保存图像
+
 
 def my_saveimage_plus(matrix,image_path):
           
@@ -84,10 +79,6 @@ def my_saveimage_plus(matrix,image_path):
     '''
     plt.figure(dpi=1000) # 清图。
 
-
-    # print(f'shape of measured_y:{matrix.shape}')
-    # print(f'type of measured_y:{matrix.dtype}')
-    # print(f'max of measured_y:{matrix.max()}')
     ax = plt.subplot()
 
     im = ax.imshow(matrix,resample=True)
@@ -100,8 +91,6 @@ def my_saveimage_plus(matrix,image_path):
     plt.colorbar(im, cax=cax)
     plt.savefig(image_path)
 
-
-
       
 def my_savetxt(matrix,txt_path):
     '''
@@ -110,9 +99,11 @@ def my_savetxt(matrix,txt_path):
 
     np.savetxt(txt_path,matrix,fmt='%.10e',delimiter=",") #frame: 相位图 array:存入文件的数组
 
+
 def my_readtxt(txt_path):
      matrix = np.loadtxt(txt_path,dtype=np.float32,delimiter=",") # frame:文件
      return matrix
+
 
 def mkdir(path):
  
@@ -152,167 +143,6 @@ def visual_data(dataloader,root_path):
         break
 
 
-# def fresnel_dfft(
-#         inpt,  wavelength, nx, ny, xstart, ystart, xend, yend, distance
-#         ):
-    
-#     '''
-#         这段代码是用于计算光的菲涅耳衍射模式的。它使用了离散傅立叶变换（DFFT）来模拟光在一定距离后的强度分布。
-#     '''
-
-#     print('fresnel_dfft')
-
-
-#     print(torch.max(inpt))
-
-#     inpt = torch.exp(1j * inpt) #wrap到0-2pi
-
-#     # wave number k
-#     wave_num = 2*torch.pi / wavelength
-    
-#     # the axis in frequency space
-#     qx = torch.linspace(0.25/xstart, 0.25/xend, nx) * nx
-#     qy = torch.linspace(0.25/ystart, 0.25/yend, ny) * ny
-    
-#     mesh_qx, mesh_qy = torch.meshgrid(qx, qy)
-    
-#     # the propagation function
-#     impulse_q = torch.exp(
-#         (1j * wave_num * distance) * 
-#         (1 - wavelength**2 * (mesh_qx**2 + mesh_qy**2))/2
-#         )
-    
-#     inpt.to(device)
-#     impulse_q.to(device)
-    
-#     part1 = torch.fft.fft2(inpt).to(device)
-#     part2 = torch.fft.ifftshift(impulse_q).to(device)
-    
-#     diffraction = torch.fft.ifft2(part1 * part2)
-#     intensity = torch.abs(diffraction) * torch.abs(diffraction)
-    
-#     return intensity
-
-# def fresnel_dfft_guiyi(
-#         inpt,  wavelength, nx, ny, xstart, ystart, xend, yend, distance
-#         ):
-    
-#     '''
-#         这段代码是用于计算光的菲涅耳衍射模式的。它使用了离散傅立叶变换（DFFT）来模拟光在一定距离后的强度分布。
-#     '''
-
-#     print('fresnel_dfft')
-
-
-#     print(torch.max(inpt))
-
-#     inpt = torch.exp(1j * inpt) #wrap到0-2pi
-
-#     # wave number k
-#     wave_num = 2*torch.pi / wavelength
-    
-#     # the axis in frequency space
-#     qx = torch.linspace(0.25/xstart, 0.25/xend, nx) * nx
-#     qy = torch.linspace(0.25/ystart, 0.25/yend, ny) * ny
-    
-#     mesh_qx, mesh_qy = torch.meshgrid(qx, qy)
-    
-#     # the propagation function
-#     impulse_q = torch.exp(
-#         (1j * wave_num * distance) * 
-#         (1 - wavelength**2 * (mesh_qx**2 + mesh_qy**2))/2
-#         )
-    
-#     inpt.to(device)
-#     impulse_q.to(device)
-    
-#     part1 = torch.fft.fft2(inpt).to(device)
-#     part2 = torch.fft.ifftshift(impulse_q).to(device)
-    
-#     diffraction = torch.fft.ifft2(part1 * part2)
-#     intensity = torch.abs(diffraction) * torch.abs(diffraction)
-    
-#     return intensity / torch.max(intensity)
-
-# def fresnel_dfft_wrap_2_2pi(
-#         inpt,  wavelength, nx, ny, xstart, ystart, xend, yend, distance
-#         ):
-#     print('fresnel_dfft_wrap_2_2pi')
-#     print(torch.max(inpt))
-
-#     inpt = inpt%(2*torch.pi) #将输入的相位限制在0到2π之间。
-
-#     print(torch.max(inpt))
-
-#     inpt = torch.exp(1j * inpt) #将相位转换为复数形式，以便进行傅立叶变换。
-
-#     # wave number k
-#     wave_num = 2*torch.pi / wavelength #计算了光的波数，波数是波长的倒数。
-    
-#     # the axis in frequency space
-#     qx = torch.linspace(0.25/xstart, 0.25/xend, nx) * nx
-#     qy = torch.linspace(0.25/ystart, 0.25/yend, ny) * ny #qx 和 qy 是频率空间的轴，它们是通过对空间轴进行傅立叶变换得到的。
-    
-#     mesh_qx, mesh_qy = torch.meshgrid(qx, qy) #生成了一个二维网格，用于计算每个点的传播函数。
-    
-#     # the propagation function
-#     impulse_q = torch.exp(
-#         (1j * wave_num * distance) * 
-#         (1 - wavelength**2 * (mesh_qx**2 + mesh_qy**2))/2
-#         ) #计算了传播函数，它描述了光在传播过程中的相位变化。
-    
-#     inpt.to(device)
-#     impulse_q.to(device)
-    
-#     part1 = torch.fft.fft2(inpt).to(device) #分别计算了输入光场和传播函数的傅立叶变换。
-#     part2 = torch.fft.ifftshift(impulse_q).to(device) #分别计算了输入光场和传播函数的傅立叶变换。
-    
-#     diffraction = torch.fft.ifft2(part1 * part2) #计算了衍射模式，它是输入光场和传播函数的傅立叶变换的乘积的逆傅立叶变换。
-#     intensity = torch.abs(diffraction) * torch.abs(diffraction) #算了衍射模式的强度，它是衍射模式的绝对值的平方。
-    
-#     return intensity
-
-
-def prop(img,  dx=2.2e-6, dy=2.2e-6, lam=532e-9, dist=0.0788,device='cuda:0'):
-    '''
-    1.注意传播距离，确保生成图像的传播距离与训练的传播距离一致，一般默认一致
-    2.输入数据的维度应该为二维，如果是三维，就算值一样傅里叶变换后也不一样
-    '''
-
-    # print(torch.max(img))
-
-    img_phase = img #*torch.pi
-
-    # print(torch.max(img_phase))
-    
-    H = torch.exp(1j * img_phase) 
-    fft_H = torch.fft.fftshift(torch.fft.fft2(H))
-
-    (Ny,Nx) = H.shape[0],H.shape[1]
-    
-    qx = torch.range(1-Nx/2, Nx/2, 1).to(device)
-    qy = torch.range(1-Ny/2, Ny/2, 1).to(device)
-    y, x = torch.meshgrid(qy, qx)
-    r=(2*torch.pi*x/(dx*Nx))**2+(2*torch.pi*y/(dy*Ny))**2
-
-    k=2*torch.pi/lam
-
-    kernel=torch.exp(-1*1j*torch.sqrt(k**2-r)*dist)
-
-    fft_HH=fft_H[:,:]*kernel
-    fft_HH=torch.fft.fftshift(fft_HH)
-
-    Ud=torch.fft.ifft2(fft_HH)
-
-    Id=Ud
-    Id1=torch.angle(Ud)
-    intensity = torch.abs(Id) * torch.abs(Id)
- 
-    # print(f'torch.max(intensity){torch.max(intensity)}')
-    # print(f'intensity{intensity}')
-
-    return intensity
-
 def result_visual(pred_ref_path,pred_sam_path,gt_ref_path,gt_sam_path,save_path,cmap='viridis'):
     pred_ref = my_readtxt(pred_ref_path)
     gt_ref = my_readtxt(gt_ref_path)
@@ -335,10 +165,48 @@ def result_visual(pred_ref_path,pred_sam_path,gt_ref_path,gt_sam_path,save_path,
     # my_saveimage(gt_sam_gt_ref,f'{save_path}/{cmap}_gt_sam_gt_ref.png',cmap)
 
 
-def sam_ref(sam,ref):
-    diff = (sam - ref + 2.3)%(np.pi)
-    diff = signal.medfilt(diff,(7,7)) #二维中值滤波    
+def sam_ref(sam,ref,scale='pi'):
+    """样品畸变相位减光纤畸变相位得到样品的相位
+
+    Args:
+        sam (numpy array): 样品畸变相位
+        ref (numpy array): 光纤畸变相位
+        scale (str, optional): 输入的是pi还是2pi. Defaults to 'pi'.
+
+    Returns:
+        numpy array: 样品的相位
+    """  
+
+    if scale=='pi':          
+        diff = (sam - ref + 2.3)%(np.pi)
+        diff = signal.medfilt(diff,(7,7)) #二维中值滤波   
+
+    elif scale=='2pi':
+        diff = (sam - ref + 4.1)%(np.pi*2)
+        diff = signal.medfilt(diff,(11,11)) #二维中值滤波     
+
     return diff
+
+def PaddingImage(img,original_width,original_height,target_width, target_height):
+    """Pad the image with zeros to expand to a fixed size.
+
+    Args:
+        img (_type_): input little image
+        original_width (_type_): width of original image
+        original_height (_type_): height of original image
+        target_width (_type_): width of target image
+        target_height (_type_): height of target image
+
+    Returns:
+        extended_image: Image after pixel padding
+    """    
+
+    x_padding = target_width - original_width
+    y_padding = target_height - original_height
+    # 使用copyMakeBorder函数在原始图片的周围添加像素
+    # blk_constant参数指定添加的像素颜色，这里是0（黑色）
+    extended_image = cv2.copyMakeBorder(img, y_padding//2, y_padding//2, x_padding//2, x_padding//2, cv2.BORDER_CONSTANT, value=0)
+    return extended_image   
 
 def sam_ref_2pi(sam,ref):
     diff = (sam - ref + 4.1)%(np.pi*2)

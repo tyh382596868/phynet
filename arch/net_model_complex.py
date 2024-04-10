@@ -23,25 +23,50 @@ class my_Sigmoid(torch.nn.Module):
 
     def forward(self, input: torch.Tensor) -> torch.Tensor:
         return torch.sigmoid(input)*torch.pi        
+class my_Sigmoid2pi(torch.nn.Module):
+    r"""Applies the element-wise function:
 
+    .. math::
+        \text{Sigmoid}(x) = \sigma(x) = \frac{1}{1 + \exp(-x)}
+
+
+    Shape:
+        - Input: :math:`(*)`, where :math:`*` means any number of dimensions.
+        - Output: :math:`(*)`, same shape as the input.
+
+    .. image:: ../scripts/activation_images/Sigmoid.png
+
+    Examples::
+
+        >>> m = nn.Sigmoid()
+        >>> input = torch.randn(2)
+        >>> output = m(input)
+    """
+
+    def forward(self, input: torch.Tensor) -> torch.Tensor:
+        return torch.sigmoid(input)*torch.pi*2  
 class conv_block(torch.nn.Module):
-    def __init__(self,in_channels,out_channels):
+    def __init__(self,in_channels,out_channels,p=0):
         super(conv_block,self).__init__()
 
         self.layer = torch.nn.Sequential(
             torch.nn.Conv2d(in_channels, out_channels, (3, 3), stride = (1, 1), padding = 1),
+            # torch.nn.Dropout(p),
             torch.nn.BatchNorm2d(out_channels),
             torch.nn.LeakyReLU(),
             
             torch.nn.Conv2d(out_channels, out_channels, (3, 3), stride = (1, 1), padding = 1),
+            # torch.nn.Dropout(p),
             torch.nn.BatchNorm2d(out_channels),
             torch.nn.LeakyReLU(),
 
             torch.nn.Conv2d(out_channels, out_channels, (3, 3), stride = (1, 1), padding = 1),
+            # torch.nn.Dropout(p),
             torch.nn.BatchNorm2d(out_channels),
             torch.nn.LeakyReLU(),
 
             torch.nn.Conv2d(out_channels, out_channels, (3, 3), stride = (1, 1), padding = 1),
+            # torch.nn.Dropout(p),
             torch.nn.BatchNorm2d(out_channels),
             torch.nn.LeakyReLU()
             )
@@ -50,20 +75,19 @@ class conv_block(torch.nn.Module):
         return self.layer(input)
 
 
-  
-        
-    
 
-class net_model_depth(torch.nn.Module):
+
+class net_model_complex(torch.nn.Module):
     
-    def __init__(self):
+    def __init__(self,drop=0.1,scale='pi',p=0):
         
-        super(net_model_depth, self).__init__()
+        super(net_model_complex, self).__init__()
         
         self.layer_01 = torch.nn.Sequential(
             torch.nn.ConvTranspose2d(
                 1, 32, (3, 3), stride = (1, 1), padding = 1
                 ),
+            # torch.nn.Dropout(p),
             torch.nn.BatchNorm2d(32),
             torch.nn.LeakyReLU(),
             
@@ -113,6 +137,7 @@ class net_model_depth(torch.nn.Module):
                 512, 256, (3, 3), stride = (2, 2), padding = 1, 
                 output_padding = 1
                 ),
+            # torch.nn.Dropout(p),
             torch.nn.BatchNorm2d(256),
             torch.nn.LeakyReLU()
             )
@@ -127,6 +152,7 @@ class net_model_depth(torch.nn.Module):
                 256, 128, (3, 3), stride = (2, 2), padding = 1, 
                 output_padding = 1
                 ),
+            # torch.nn.Dropout(p),
             torch.nn.BatchNorm2d(128),
             torch.nn.LeakyReLU()
             )
@@ -140,6 +166,7 @@ class net_model_depth(torch.nn.Module):
                 128, 64, (3, 3), stride = (2, 2), padding = 1, 
                 output_padding = 1
                 ),
+            # torch.nn.Dropout(p),
             torch.nn.BatchNorm2d(64),
             torch.nn.LeakyReLU()
             )
@@ -153,20 +180,22 @@ class net_model_depth(torch.nn.Module):
                 64, 32, (3, 3), stride = (2, 2), padding = 1, 
                 output_padding = 1
                 ),
+            # torch.nn.Dropout(p),
             torch.nn.BatchNorm2d(32),
             torch.nn.LeakyReLU()
             )
             
         self.layer_09_02 = conv_block(in_channels=64,out_channels=32)
         
-        # layer_10
-        
         self.layer_10 = torch.nn.Sequential(
-            torch.nn.Conv2d(32, 1, (3, 3), stride = (1, 1), padding = 1),
-            torch.nn.BatchNorm2d(1),
+            torch.nn.Conv2d(32, 2, (3, 3), stride = (1, 1), padding = 1),
+            # torch.nn.Dropout(drop),
+            torch.nn.BatchNorm2d(2),
             # torch.nn.LeakyReLU()
             my_Sigmoid()
-            )
+
+            )         
+  
         
     def forward(self, x):
         
@@ -220,16 +249,16 @@ if __name__=='__main__':
     #         torch.nn.ConvTranspose2d(
     #             1, 32, (3, 3), stride = (1, 1), padding = 1
     #             ),
-    #         torch.nn.BatchNorm2d(32),
+    #         torch.nn.Dropout(32),
     #         torch.nn.LeakyReLU(),
             
     #         # torch.nn.Conv2d(32, 32, (3, 3), stride = (1, 1), padding = 1),
-    #         # torch.nn.BatchNorm2d(32),
+    #         # torch.nn.Dropout(32),
     #         # torch.nn.LeakyReLU()
     #         conv_block(in_channels=32,out_channels=32)
     #         )
     #net =  conv_block(in_channels=1,out_channels=16)
-    net = net_model_depth()
+    net = net_model_complex()
     y = net(x)
     print(y.shape)
     print(net)

@@ -4,31 +4,33 @@ from torchvision import transforms
 from PIL import Image
 import copy
 from source_target_transforms import *
+from library import my_save2image
+
 class mydataset(torch.utils.data.Dataset):
     # 从txt文件中读矩阵
-    def __init__(self,Amp,Pha,transform=None):
+    def __init__(self,speckle,Pha,transform=None):
 
-        self.Amp = (Amp)      
+        self.speckle = (speckle)      
         self.Pha = (Pha)
         self.transform = transform
 
         
     def __getitem__(self,idx):
 
-        self.Amp_copy = copy.deepcopy(self.Amp)
+        self.speckle_copy = copy.deepcopy(self.speckle)
         self.Pha_copy = copy.deepcopy(self.Pha)
-        print(self.Amp_copy.shape,self.Pha_copy.shape)
+        # print(self.speckle_copy.shape,self.Pha_copy.shape)
         
         if self.transform is not None:
             
-            self.Amp_copy = Image.fromarray(self.Amp_copy)
+            self.speckle_copy = Image.fromarray(self.speckle_copy)
             self.Pha_copy = Image.fromarray(self.Pha_copy)  
             # print(self.Amp_copy.shape,self.Pha_copy.shape)      
                 
-            self.Amp_copy, self.Pha_copy = self.transform((self.Amp_copy, self.Pha_copy))
-            print(self.Amp_copy.shape,self.Pha_copy.shape)
+            self.speckle_copy, self.Pha_copy = self.transform((self.speckle_copy, self.Pha_copy))
+            # print(self.speckle_copy.shape,self.Pha_copy.shape)
         
-        return self.Amp_copy,self.Pha_copy #使数据类型和模型参数类型一样
+        return self.speckle_copy,self.Pha_copy #使数据类型和模型参数类型一样
 
     def __len__(self):
 
@@ -36,28 +38,7 @@ class mydataset(torch.utils.data.Dataset):
     
 import matplotlib.pyplot as plt
 
-def my_save2image(matrix1, matrix2, image_path, cmap='viridis'):
-    '''
-    matrix1, matrix2: float32 [H,W] - 分别代表两个要显示的图像矩阵
-    image_path: 保存图像的路径
-    cmap: 颜色映射
-    '''
 
-    plt.clf()  # 清图。
-    plt.cla()  # 清坐标轴
-    plt.figure(figsize=(12, 6))  # 设定图像大小
-
-    # 显示第一个图像
-    plt.subplot(1, 2, 1)
-    imgplot1 = plt.imshow(matrix1, cmap=cmap)
-    plt.colorbar()  # 为第一个图像添加颜色条
-
-    # 显示第二个图像
-    plt.subplot(1, 2, 2)
-    imgplot2 = plt.imshow(matrix2, cmap=cmap)
-    plt.colorbar()  # 为第二个图像添加颜色条
-
-    plt.savefig(image_path)  # 保存图像
 
 if __name__ == '__main__':
 

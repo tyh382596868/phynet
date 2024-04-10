@@ -1,0 +1,40 @@
+target: ''
+exp_name: 'test'
+
+num: 100
+scale: '2pi'
+dist: 0.6
+# image_height: 3000
+# image_width: 3000
+constraint: 'weak'
+# 'strong'
+# 'weak'
+#'strong'
+resize:
+  flag: True
+  size: 256
+fi: 4
+device: 'cuda'
+seed: 1
+batch_size: 1
+lr: 0.0001
+epochs: 9100
+
+model:
+  name: 'U_Net'
+  filename: 'model'
+  classname: 'U_Net'
+  p: 0.01
+  # scale: '2pi'
+
+
+loss:
+  name: 'MSELoss'
+
+loops: [10,100,1000,3000,10000,15000]
+
+  # 'L1Loss'        
+# # prop的默认参数
+# dx = 2.2e-6
+# dy = dx
+# lam = 532e-9

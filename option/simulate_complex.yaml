@@ -1,0 +1,36 @@
+target: ''
+exp_name: 'test'
+
+num: 1000
+scale: 'pi'
+dist: 0.4
+# image_height: 3000
+# image_width: 3000
+constraint: 'complex'
+#'strong'
+resize:
+  flag: True
+  size: 512
+fi: 2
+device: 'cuda'
+seed: 1
+batch_size: 1
+lr: 0.0001
+epochs: 9100
+
+model:
+  name: 'net_model_complex'
+  p: 0
+  # scale: '2pi'
+
+train_epoch: 'train_epoch_complex_gs'
+loss:
+  name: 'MSELoss'
+
+loops: [10,100,1000,3000,10000,15000]
+
+  # 'L1Loss'        
+# # prop的默认参数
+# dx = 2.2e-6
+# dy = dx
+# lam = 532e-9
