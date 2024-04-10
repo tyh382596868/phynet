@@ -23,7 +23,28 @@ class my_Sigmoid(torch.nn.Module):
 
     def forward(self, input: torch.Tensor) -> torch.Tensor:
         return torch.sigmoid(input)*torch.pi        
+class my_Sigmoid2pi(torch.nn.Module):
+    r"""Applies the element-wise function:
 
+    .. math::
+        \text{Sigmoid}(x) = \sigma(x) = \frac{1}{1 + \exp(-x)}
+
+
+    Shape:
+        - Input: :math:`(*)`, where :math:`*` means any number of dimensions.
+        - Output: :math:`(*)`, same shape as the input.
+
+    .. image:: ../scripts/activation_images/Sigmoid.png
+
+    Examples::
+
+        >>> m = nn.Sigmoid()
+        >>> input = torch.randn(2)
+        >>> output = m(input)
+    """
+
+    def forward(self, input: torch.Tensor) -> torch.Tensor:
+        return torch.sigmoid(input)*torch.pi*2  
 class conv_block(torch.nn.Module):
     def __init__(self,in_channels,out_channels):
         super(conv_block,self).__init__()
@@ -54,7 +75,7 @@ class conv_block(torch.nn.Module):
 
 class net_model_Dropout_full(torch.nn.Module):
     
-    def __init__(self,drop=0.1):
+    def __init__(self,drop=0.1,scale='pi'):
         
         super(net_model_Dropout_full, self).__init__()
         
@@ -158,13 +179,24 @@ class net_model_Dropout_full(torch.nn.Module):
         self.layer_09_02 = conv_block(in_channels=64,out_channels=32)
         
         # layer_10
-        
-        self.layer_10 = torch.nn.Sequential(
-            torch.nn.Conv2d(32, 1, (3, 3), stride = (1, 1), padding = 1),
-            torch.nn.Dropout(drop),
-            # torch.nn.LeakyReLU()
-            my_Sigmoid()
-            )
+        if scale=='pi':  
+            print('scale is pi')      
+            self.layer_10 = torch.nn.Sequential(
+                torch.nn.Conv2d(32, 1, (3, 3), stride = (1, 1), padding = 1),
+                torch.nn.Dropout(drop),
+                # torch.nn.LeakyReLU()
+                my_Sigmoid()
+                )
+        elif scale=='2pi':
+            print('scale is 2pi')
+            self.layer_10 = torch.nn.Sequential(
+                torch.nn.Conv2d(32, 1, (3, 3), stride = (1, 1), padding = 1),
+                torch.nn.Dropout(drop),
+                # torch.nn.LeakyReLU()
+                my_Sigmoid2pi()
+                )    
+        else:
+            raise Exception("scale must be pi or 2pi")    
         
     def forward(self, x):
         

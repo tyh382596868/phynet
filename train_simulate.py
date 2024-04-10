@@ -4,7 +4,7 @@ import random
 import os
 
 import sys 
-sys.path.append("/mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/phynet")
+sys.path.append("D:\\tyh\phynet")
 
 
 from os.path import join, getsize
@@ -109,11 +109,11 @@ def getData(para):
     
     
     # 使用新参数
-    rootpath = '/mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/simulateData'
+    rootpath = f'../simulateData/simulate_data/{para.constraint}/{para.scale}/{para.num}/{para.dist}/{para.fi}'
     
     # 相机的像素
-    height = para.image_height
-    width = para.image_width
+    height = int(data[num][1]*para.fi)#para.image_height
+    width = int(data[num][1]*para.fi)#para.image_width
 
     # 光纤的圆心和半径，决定了光纤间的间隙
     fiber_center = (width/2, height/2)
@@ -133,24 +133,28 @@ def getData(para):
     core_radius = 9
     number_of_cores = num
     
-    mkdir(f"{rootpath}/simulate_data/{scale}/{num}")
+    mkdir(f"{rootpath}")
     
     pha = create_circles_in_rectangle_within_circle(height, width, a, b, number_of_cores, core_radius, fiber_radius,ispha='pha',scale=scale)
-    np.savetxt(f'{rootpath}/simulate_data/{scale}/{number_of_cores}/{number_of_cores}_pha_simulate.txt',pha,fmt='%.10e',delimiter=',')
+    if para.resize['flag'] == True:
+        pha = cv2.resize(pha, (para.resize['size'],para.resize['size']), interpolation=cv2.INTER_CUBIC)
+    np.savetxt(f'{rootpath}/{number_of_cores}_pha_simulate.txt',pha,fmt='%.10e',delimiter=',')
     # 显示图像
     plt.figure(figsize=(6, 6))
     plt.imshow(pha, cmap='viridis')  # 使用HSV色彩映射以更好地显示相位
     plt.colorbar()
-    plt.savefig(f'{rootpath}/simulate_data/{scale}/{number_of_cores}/{number_of_cores}_pha_simulate.png',dpi=800)#
+    plt.savefig(f'{rootpath}/{number_of_cores}_pha_simulate.png',dpi=800)#
     print('pha Done!!')
 
     amp = create_circles_in_rectangle_within_circle(height, width, a, b, number_of_cores, core_radius, fiber_radius,ispha='amp')
-    np.savetxt(f'{rootpath}/simulate_data/{scale}/{number_of_cores}/{number_of_cores}_amp_simulate.txt',amp,fmt='%.10e',delimiter=',')
+    if para.resize['flag'] == True:
+        amp = cv2.resize(amp, (para.resize['size'],para.resize['size']), interpolation=cv2.INTER_CUBIC)
+    np.savetxt(f'{rootpath}/{number_of_cores}_amp_simulate.txt',amp,fmt='%.10e',delimiter=',')
     # 显示图像
     plt.figure(figsize=(6, 6))
     plt.imshow(amp, cmap='viridis')  # 使用HSV色彩映射以更好地显示相位
     plt.colorbar()
-    plt.savefig(f'{rootpath}/simulate_data/{scale}/{number_of_cores}/{number_of_cores}_amp_simulate.png',dpi=800)#
+    plt.savefig(f'{rootpath}/{number_of_cores}_amp_simulate.png',dpi=800)#
     print('amp Done!!')
 
     # 2.光纤掩膜
@@ -159,7 +163,7 @@ def getData(para):
     mask[mask > 0.0001] = 1
     kernel = np.ones((11,11),np.uint8)
     mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
-    my_saveimage(mask, f'{rootpath}/simulate_data/{scale}/{number_of_cores}/{number_of_cores}_mask_simulate.png')
+    my_saveimage(mask, f'{rootpath}/{number_of_cores}_mask_simulate.png')
 
     
     # generate speckle
@@ -175,8 +179,8 @@ def getData(para):
 
     dist_prop = str(dist).replace('.','')
     
-    my_saveimage(speckle,f'{rootpath}/simulate_data/{scale}/{number_of_cores}/{number_of_cores}_speckle_prop{dist_prop}_simulate.png',dpi=800)
-    my_savetxt(speckle,f'{rootpath}/simulate_data/{scale}/{number_of_cores}/{number_of_cores}_speckle_prop{dist_prop}_simulate.txt')
+    my_saveimage(speckle,f'{rootpath}/{number_of_cores}_speckle_prop{dist_prop}_simulate.png',dpi=800)
+    my_savetxt(speckle,f'{rootpath}/{number_of_cores}_speckle_prop{dist_prop}_simulate.txt')
     print('speckle Done!!')  
     
     return pha.numpy(),amp.numpy(),mask,speckle.numpy()  
@@ -184,7 +188,7 @@ def getData(para):
 if __name__=="__main__":
 
     parser = argparse.ArgumentParser(description='Training script')
-    parser.add_argument('--opt', type=str, default='/mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/phynet/option/simulate.yaml', help='Path to the configuration file')
+    parser.add_argument('--opt', type=str, default='D:\\tyh\phynet\option\simulate.yaml', help='Path to the configuration file')
     args = parser.parse_args()
     para = Parameter(args.opt)
 
@@ -199,7 +203,7 @@ if __name__=="__main__":
     
     localtime = time.strftime("%Y-%m-%d-%H-%M", time.localtime())    
  
-    result_folder = f'/mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet_git/Resultimulate/{para.scale}/{para.num}/{para.dist}/{localtime}'
+    result_folder = f'../Resultimulate/{para.constraint}/{para.scale}/{para.num}/{para.dist}/{para.fi}/{localtime}'
 
     tb_folder = f'{result_folder}/tb_folder'
     weight_folder = f"{result_folder}/weight_folder"
@@ -234,9 +238,10 @@ if __name__=="__main__":
     # 3.model
     print(para.model['name'])
     model_name = para.model['name']
-    modelnet = import_class('arch.'+model_name,model_name) 
+    modelnet = import_class('arch.'+para.model['filename'],para.model['classname']) 
+    # modelnet = import_class('arch.'+model_name,model_name) 
     if  para.model['name'] == 'net_model_Dropout_full':
-        net  =  modelnet(drop=para.model['p']).to(device)                        
+        net  =  modelnet(drop=para.model['p'],scale=para.scale).to(device)                        
     else:
         net  =  modelnet().to(device) 
     print('creating model')
@@ -264,6 +269,7 @@ if __name__=="__main__":
     hypar_file = open(f"{result_folder}/hypar.txt","w")
     # 记录训练开始前的超参数，网络结构，输入强度图，gt图像
     hypar_file.write(f'target： {para.target}\n')
+    hypar_file.write(f'para.fi:{para.fi}\n')
     hypar_file.write(f'num of core {para.num}\n')
     hypar_file.write(f'scale of angle {para.scale}\n')
     hypar_file.write(f'dist of prop {para.dist}\n')
@@ -271,6 +277,7 @@ if __name__=="__main__":
     hypar_file.write(f'lr {lr}\n')
     hypar_file.write(f'epochs {epochs}\n')
     hypar_file.write(f'network\n{net}\n')
+    
     hypar_file.close() 
     
     # tensorboard
@@ -289,8 +296,11 @@ if __name__=="__main__":
             pred_pha = net(Speckle) 
             
             flattened_pred_pha = pred_pha[0, 0, :, :] 
-            
-            Uo = amp_gt*torch.exp(1j*flattened_pred_pha) #光纤端面初始复光场
+            if para.constraint == 'strong':
+                Uo = amp_gt*torch.exp(1j*flattened_pred_pha) #光纤端面初始复光场
+            elif para.constraint == 'weak':
+                Uo = mask_gt*torch.exp(1j*flattened_pred_pha) #光纤端面初始复光场
+                
             Ui = propcomplex(Uo,dist=para.dist,device=device)            
                  
             pred_Speckle = torch.abs(Ui)
@@ -329,17 +339,18 @@ if __name__=="__main__":
 
             # 记录中间结果图片
             if step % 3000 == 0:
-                        my_saveimage(flattened_pred_pha.cpu().detach().numpy(),f'{img_txt_folder}/{step}_PredPha.png')
+                        dpi = 800
+                        my_saveimage(flattened_pred_pha.cpu().detach().numpy(),f'{img_txt_folder}/{step}_PredPha.png',dpi=dpi)
                         my_savetxt(flattened_pred_pha.cpu().detach().numpy(),f'{img_txt_folder}/{step}_PredPha.txt')
 
-                        my_saveimage(pred_Speckle.cpu().detach().numpy(),f'{img_txt_folder}/{step}_PredAmp.png')
+                        my_saveimage(pred_Speckle.cpu().detach().numpy(),f'{img_txt_folder}/{step}_PredAmp.png',dpi=dpi)
                         my_savetxt(pred_Speckle.cpu().detach().numpy(),f'{img_txt_folder}/{step}_PredAmp.txt')
 
-                        my_saveimage((Speckle[0, 0, :, :]-pred_Speckle).cpu().detach().numpy(),f'{img_txt_folder}/{step}_AmpLoss.png')
+                        my_saveimage((Speckle[0, 0, :, :]-pred_Speckle).cpu().detach().numpy(),f'{img_txt_folder}/{step}_AmpLoss.png',dpi=dpi)
                         my_savetxt((Speckle[0, 0, :, :]-pred_Speckle).cpu().detach().numpy(),f'{img_txt_folder}/{step}_AmpLoss.txt')
                         
-                        my_saveimage(pha_gt-((flattened_pred_pha).cpu().detach().numpy()),f'{img_txt_folder}/{step}_PhaLoss.png')
-                        my_savetxt(pha_gt-((flattened_pred_pha).cpu().detach().numpy()),f'{img_txt_folder}/{step}_PhaLoss.txt')
+                        my_saveimage(np.mod(pha_gt-((flattened_pred_pha).cpu().detach().numpy()),2*np.pi),f'{img_txt_folder}/{step}_PhaLoss.png',dpi=dpi)
+                        my_savetxt(np.mod(pha_gt-((flattened_pred_pha).cpu().detach().numpy()),2*np.pi),f'{img_txt_folder}/{step}_PhaLoss.txt')
 
             if step % 40 == 0:
                 # 80的时候显存差不多满了
@@ -370,7 +381,7 @@ if __name__=="__main__":
                 imgplot2 = plt.imshow((Speckle[0, 0, :, :]-pred_Speckle).cpu().detach().numpy(), cmap='viridis')
                 plt.colorbar()  # 为第二个图像添加颜色条
 
-                plt.savefig(f'{img_txt_folder}/{step}_result.png')  # 保存图像                
+                plt.savefig(f'{img_txt_folder}/{step}_result.png',dpi=800)  # 保存图像                
             # my_save2image(Speckle[0,0,:,:].numpy(),Pha[0,0,:,:].numpy(),f'./{epoch}_combined_image.png', cmap='viridis')
                 
 

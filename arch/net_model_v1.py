@@ -204,8 +204,8 @@ class net_model_v1(torch.nn.Module):
         self.layer_10 = torch.nn.Sequential(
             torch.nn.Conv2d(32, 1, (3, 3), stride = (1, 1), padding = 1),
             torch.nn.BatchNorm2d(1),
-            # torch.nn.LeakyReLU()
-            my_Sigmoid()
+            torch.nn.LeakyReLU()
+            # my_Sigmoid()
             )
         
     def forward(self, x):

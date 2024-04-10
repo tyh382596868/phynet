@@ -4,7 +4,7 @@ import importlib
 
 class Parameter:
     def __init__(self, config_path):
-        with open(config_path, 'r') as file:
+        with open(config_path, 'rb') as file:
             self.config = yaml.safe_load(file)
 
     def __getattr__(self, item):

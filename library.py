@@ -41,6 +41,8 @@ def my_saveimage(matrix,image_path,cmap='viridis',dpi=200):
 
     plt.clf() # 清图。
     plt.cla() # 清坐标轴
+
+    plt.figure(figsize=(6, 6))
     imgplot = plt.imshow(matrix,cmap=cmap)
     plt.colorbar()
     plt.savefig(image_path,dpi=dpi)
