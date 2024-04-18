@@ -26,6 +26,7 @@ import torchvision
 from torch.utils.tensorboard import SummaryWriter
 from source_target_transforms import *
 from utils.compute_metric import compute_core_std_plot
+from torch.cuda.amp import autocast as autocast
 def create_circles_in_rectangle_within_circle(height, width, a, b, number_of_cores, core_radius, fiber_radius,ispha='pha',scale = 'pi'):
     # 创建一个空白图像
     
@@ -137,8 +138,8 @@ def getData(para):
     mkdir(f"{rootpath}")
     
     pha = create_circles_in_rectangle_within_circle(height, width, a, b, number_of_cores, core_radius, fiber_radius,ispha='pha',scale=scale)
-    if para.before_resize['flag'] == True:
-        pha = cv2.resize(pha, (para.resize['size'],para.resize['size']), interpolation=cv2.INTER_CUBIC)
+    # if para.before_resize['flag'] == True:
+    #     pha = cv2.resize(pha, (para.resize['size'],para.resize['size']), interpolation=cv2.INTER_CUBIC)
     np.savetxt(f'{rootpath}/{number_of_cores}_pha_simulate.txt',pha,fmt='%.10e',delimiter=',')
     # 显示图像
     plt.figure(figsize=(6, 6))
@@ -148,8 +149,8 @@ def getData(para):
     print('pha Done!!')
 
     amp = create_circles_in_rectangle_within_circle(height, width, a, b, number_of_cores, core_radius, fiber_radius,ispha='amp')
-    if para.before_resize['flag'] == True:
-        amp = cv2.resize(amp, (para.resize['size'],para.resize['size']), interpolation=cv2.INTER_CUBIC)
+    # if para.before_resize['flag'] == True:
+    #     amp = cv2.resize(amp, (para.resize['size'],para.resize['size']), interpolation=cv2.INTER_CUBIC)
     np.savetxt(f'{rootpath}/{number_of_cores}_amp_simulate.txt',amp,fmt='%.10e',delimiter=',')
     # 显示图像
     plt.figure(figsize=(6, 6))
@@ -195,16 +196,16 @@ if __name__=="__main__":
 
     pha_gt,amp_gt,mask_gt,speckle_gt  = getData(para)
 
-    if para.after_resize['flag'] == True:
-        print(type(pha_gt))
-        print(type(amp_gt))
-        print(type(mask_gt))
-        print(type(speckle_gt))
-        pha_gt = cv2.resize(pha_gt, (para.after_resize['size'],para.after_resize['size']), interpolation=cv2.INTER_CUBIC)
-        amp_gt = cv2.resize(amp_gt, (para.after_resize['size'],para.after_resize['size']), interpolation=cv2.INTER_CUBIC)
-        mask_gt = cv2.resize(mask_gt, (para.after_resize['size'],para.after_resize['size']), interpolation=cv2.INTER_CUBIC)
-        speckle_gt = cv2.resize(speckle_gt, (para.after_resize['size'],para.after_resize['size']), interpolation=cv2.INTER_CUBIC)
-        print('resize Done!!')
+    # if para.after_resize['flag'] == True:
+    #     print(type(pha_gt))
+    #     print(type(amp_gt))
+    #     print(type(mask_gt))
+    #     print(type(speckle_gt))
+    #     pha_gt = cv2.resize(pha_gt, (para.after_resize['size'],para.after_resize['size']), interpolation=cv2.INTER_CUBIC)
+    #     amp_gt = cv2.resize(amp_gt, (para.after_resize['size'],para.after_resize['size']), interpolation=cv2.INTER_CUBIC)
+    #     mask_gt = cv2.resize(mask_gt, (para.after_resize['size'],para.after_resize['size']), interpolation=cv2.INTER_CUBIC)
+    #     speckle_gt = cv2.resize(speckle_gt, (para.after_resize['size'],para.after_resize['size']), interpolation=cv2.INTER_CUBIC)
+    #     print('resize Done!!')
     
 
 
@@ -295,6 +296,7 @@ if __name__=="__main__":
     mask_gt = torch.tensor(mask_gt).to(device)
 
     print('starting loop')
+    scaler = torch.cuda.amp.GradScaler()
     for current_epoch in tqdm(range(epochs)):
         for i, (Speckle,Pha) in enumerate(dataloader):
             Speckle = Speckle.to(device)
@@ -302,25 +304,29 @@ if __name__=="__main__":
             
             optimizer.zero_grad()
             # forward proapation
-            pred_pha = net(Speckle) 
-            
-            flattened_pred_pha = pred_pha[0, 0, :, :] 
-            if para.constraint == 'strong':
-                Uo = amp_gt*torch.exp(1j*flattened_pred_pha) #光纤端面初始复光场
-            elif para.constraint == 'weak':
-                Uo = mask_gt*torch.exp(1j*flattened_pred_pha) #光纤端面初始复光场
+            with torch.cuda.amp.autocast():
                 
-            Ui = propcomplex(Uo,dist=para.dist,device=device)            
-                 
-            pred_Speckle = torch.abs(Ui)
+                pred_pha = net(Speckle) 
+                
+                flattened_pred_pha = pred_pha[0, 0, :, :] 
+                if para.constraint == 'strong':
+                    Uo = amp_gt*torch.exp(1j*flattened_pred_pha) #光纤端面初始复光场
+                elif para.constraint == 'weak':
+                    Uo = mask_gt*torch.exp(1j*flattened_pred_pha) #光纤端面初始复光场
+                    
+                Ui = propcomplex(Uo,dist=para.dist,device=device)            
+                    
+                pred_Speckle = torch.abs(Ui)
 
-            loss_mse_value = loss_mse(Speckle[0, 0, :, :].float(),pred_Speckle.float())
-            loss_value =  loss_mse_value
+                loss_mse_value = loss_mse(Speckle[0, 0, :, :].float(),pred_Speckle.float())
+                loss_value =  loss_mse_value
 
             # backward proapation
-            loss_value.backward()
-            
-            optimizer.step()    
+            # loss_value.backward()
+            scaler.scale(loss_value).backward()
+            # optimizer.step()  
+            scaler.step(optimizer) 
+            scaler.update() 
                     
             # 实验记录
 
@@ -362,8 +368,8 @@ if __name__=="__main__":
                         my_savetxt(np.mod(pha_gt-((flattened_pred_pha).cpu().detach().numpy()),2*np.pi),f'{img_txt_folder}/{step}_PhaLoss.txt')
                         
                         compute_core_std_plot(amp_gt.cpu().detach().numpy(),np.mod(pha_gt-((flattened_pred_pha).cpu().detach().numpy()),2*np.pi),f'{img_txt_folder}/{step}core_std.png',meanflag=True,labeledflag=True)
-                        my_saveimage((amp_gt*flattened_pred_pha).cpu().detach().numpy(),f'{img_txt_folder}/{step}_Phamulmask.png',dpi=dpi)
                         # compute_core_std_plot(amp_gt.cpu().detach().numpy(),np.mod(flattened_pred_pha.cpu().detach().numpy(),2*np.pi),f'{img_txt_folder}/{step}core_std.png',outputflag=True)
+                        my_saveimage(np.mod((amp_gt*flattened_pred_pha).cpu().detach().numpy(),2*np.pi),f'{img_txt_folder}/{step}_Phamulmask.png',dpi=dpi)
                         plt.close()
                         
             # if step == 1000:

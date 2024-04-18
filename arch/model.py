@@ -4,7 +4,13 @@ import torch.nn.functional as F
 import torch.utils.data
 import torch
 
+def cat_(x1, x2):
+    diffY = x2.size()[2] - x1.size()[2]
+    diffX = x2.size()[3] - x1.size()[3]
+    x1 = F.pad(x1, (diffX // 2, diffX - diffX//2, diffY // 2, diffY - diffY//2))  
+    x = torch.cat([x2, x1], dim=1)
 
+    return x
 class conv_block(nn.Module):
     """
     Convolution Block 
@@ -100,20 +106,30 @@ class U_Net(nn.Module):
         e5 = self.Conv5(e5)
 
         d5 = self.Up5(e5)
-        d5 = torch.cat((e4, d5), dim=1)
+
+        
+        # d5 = torch.cat((e4, d5), dim=1)
+        d5 = cat_(d5, e4)
+        
 
         d5 = self.Up_conv5(d5)
 
         d4 = self.Up4(d5)
-        d4 = torch.cat((e3, d4), dim=1)
+        # d4 = torch.cat((e3, d4), dim=1)
+        d4 = cat_(d4, e3)
+        
         d4 = self.Up_conv4(d4)
 
         d3 = self.Up3(d4)
-        d3 = torch.cat((e2, d3), dim=1)
+        # d3 = torch.cat((e2, d3), dim=1)
+        d3 = cat_(d3, e2)
+        
         d3 = self.Up_conv3(d3)
 
         d2 = self.Up2(d3)
-        d2 = torch.cat((e1, d2), dim=1)
+        # d2 = torch.cat((e1, d2), dim=1)
+        d2 = cat_(d2, e1)
+        
         d2 = self.Up_conv2(d2)
 
         out = self.Conv(d2)
@@ -488,7 +504,7 @@ class NestedUNet(nn.Module):
     Implementation of this paper:
     https://arxiv.org/pdf/1807.10165.pdf
     """
-    def __init__(self, in_ch=3, out_ch=1):
+    def __init__(self, in_ch=1, out_ch=1):
         super(NestedUNet, self).__init__()
 
         n1 = 64
