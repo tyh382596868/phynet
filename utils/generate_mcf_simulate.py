@@ -239,11 +239,13 @@ def mcf_simulate(para,data=None):
 
     
     pha = create_circles_in_rectangle_within_circle(height, width, a, b, number_of_cores, core_radius, fiber_radius,ispha='pha',scale=scale)
-
+    if para.before_resize['flag'] == True:
+        pha = cv2.resize(pha, (para.before_resize['size'],para.before_resize['size']), interpolation=cv2.INTER_CUBIC)
     print('pha Done!!')
 
     amp = create_circles_in_rectangle_within_circle(height, width, a, b, number_of_cores, core_radius, fiber_radius,ispha='amp')
-
+    if para.before_resize['flag'] == True:
+        amp = cv2.resize(amp, (para.before_resize['size'],para.before_resize['size']), interpolation=cv2.INTER_CUBIC)
     print('amp Done!!')
 
     # 2.光纤掩膜
@@ -302,7 +304,9 @@ def mcf_simulate_plot(para,data=None):
     
     my_saveimage(speckle,f'{rootpath}/{para.num}_speckle_prop{dist_prop}_simulate.png',dpi=800)
     my_savetxt(speckle,f'{rootpath}/{para.num}_speckle_prop{dist_prop}_simulate.txt')
-    print('speckle Done!!')      
+    print('speckle Done!!')    
+    
+    return pha,amp,mask,speckle   
     
 import matplotlib.pyplot as plt
 import matplotlib

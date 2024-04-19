@@ -3,7 +3,28 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.utils.data
 import torch
+class my_Sigmoid2pi(torch.nn.Module):
+    r"""Applies the element-wise function:
 
+    .. math::
+        \text{Sigmoid}(x) = \sigma(x) = \frac{1}{1 + \exp(-x)}
+
+
+    Shape:
+        - Input: :math:`(*)`, where :math:`*` means any number of dimensions.
+        - Output: :math:`(*)`, same shape as the input.
+
+    .. image:: ../scripts/activation_images/Sigmoid.png
+
+    Examples::
+
+        >>> m = nn.Sigmoid()
+        >>> input = torch.randn(2)
+        >>> output = m(input)
+    """
+
+    def forward(self, input: torch.Tensor) -> torch.Tensor:
+        return torch.sigmoid(input)*torch.pi*2 
 def cat_(x1, x2):
     diffY = x2.size()[2] - x1.size()[2]
     diffX = x2.size()[3] - x1.size()[3]
@@ -87,7 +108,7 @@ class U_Net(nn.Module):
 
         self.Conv = nn.Conv2d(filters[0], out_ch, kernel_size=1, stride=1, padding=0)
 
-       # self.active = torch.nn.Sigmoid()
+        self.active = my_Sigmoid2pi()
 
     def forward(self, x):
 
@@ -108,33 +129,33 @@ class U_Net(nn.Module):
         d5 = self.Up5(e5)
 
         
-        # d5 = torch.cat((e4, d5), dim=1)
-        d5 = cat_(d5, e4)
+        d5 = torch.cat((e4, d5), dim=1)
+        # d5 = cat_(d5, e4)
         
 
         d5 = self.Up_conv5(d5)
 
         d4 = self.Up4(d5)
-        # d4 = torch.cat((e3, d4), dim=1)
-        d4 = cat_(d4, e3)
+        d4 = torch.cat((e3, d4), dim=1)
+        # d4 = cat_(d4, e3)
         
         d4 = self.Up_conv4(d4)
 
         d3 = self.Up3(d4)
-        # d3 = torch.cat((e2, d3), dim=1)
-        d3 = cat_(d3, e2)
+        d3 = torch.cat((e2, d3), dim=1)
+        # d3 = cat_(d3, e2)
         
         d3 = self.Up_conv3(d3)
 
         d2 = self.Up2(d3)
-        # d2 = torch.cat((e1, d2), dim=1)
-        d2 = cat_(d2, e1)
+        d2 = torch.cat((e1, d2), dim=1)
+        # d2 = cat_(d2, e1)
         
         d2 = self.Up_conv2(d2)
 
         out = self.Conv(d2)
 
-        #d1 = self.active(out)
+        out = self.active(out)
 
         return out
 
@@ -187,7 +208,7 @@ class R2U_Net(nn.Module):
     R2U-Unet implementation
     Paper: https://arxiv.org/abs/1802.06955
     """
-    def __init__(self, img_ch=3, output_ch=1, t=2):
+    def __init__(self, img_ch=1, output_ch=1, t=2):
         super(R2U_Net, self).__init__()
 
         n1 = 64
@@ -306,7 +327,7 @@ class AttU_Net(nn.Module):
     Attention Unet implementation
     Paper: https://arxiv.org/abs/1804.03999
     """
-    def __init__(self, img_ch=3, output_ch=1):
+    def __init__(self, img_ch=1, output_ch=1):
         super(AttU_Net, self).__init__()
 
         n1 = 64
