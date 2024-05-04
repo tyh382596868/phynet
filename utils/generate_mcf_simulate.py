@@ -4,7 +4,7 @@ import random
 import os
 
 import sys 
-sys.path.append("D:\\tyh\phynet")
+sys.path.append("/mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet/option/simulate.yaml")
 
 
 from os.path import join, getsize
@@ -215,8 +215,16 @@ def mcf_simulate(para,data=None):
         data = data
         
     # 相机的像素
-    height = para.image_height#int(data[num][1]*para.fi)#para.image_height
-    width = para.image_width#int(data[num][1]*para.fi)#para.image_width
+    
+    if para.isfi == True:
+        
+        height = int(data[num][1]*para.fi)#para.image_height
+        width = int(data[num][1]*para.fi)#para.image_width
+        print(f'图片像素是光纤束的{para.fi}倍')
+    else:        
+        height = para.image_height#int(data[num][1]*para.fi)#para.image_height
+        width = para.image_width#int(data[num][1]*para.fi)#para.image_width
+        print(f'图片像素是光纤束的{height}_{width}倍')
 
     # 光纤的圆心和半径，决定了光纤间的间隙
     fiber_center = (width/2, height/2)

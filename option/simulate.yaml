@@ -1,10 +1,13 @@
 target: ''
 exp_name: 'test'
 
-num: 1000
+num: 10
 scale: '2pi'
-dist: 0.06
+dist: 0.6
 core_radius: 6 #5
+
+fi: 2
+isfi: True
 image_height: 1300 #400 #1920
 image_width: 1300 #400 #1920
 
@@ -14,22 +17,23 @@ constraint: 'strong'
 #'strong'
 
 before_resize:
-  flag: True
+  flag: False
   size: 1920
 
 after_resize:
   flag: False
   size: 1024
+
 noise:
   flag: False
   mean: 0
   std: 0.01
-fi: 2
+
 device: 'cuda'
 seed: 1
 batch_size: 1
 lr: 0.001
-epochs: 11100
+epochs: 10000
 # model:
 #   name: 'net_model_Dropout_full'
 #   filename: 'net_model_Dropout_full'

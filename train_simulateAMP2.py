@@ -4,7 +4,7 @@ import random
 import os
 
 import sys 
-sys.path.append("D:\\tyh\phynet")
+sys.path.append("/mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet")
 
 
 from os.path import join, getsize
@@ -32,7 +32,7 @@ from utils.generate_mcf_simulate import mcf_simulate_plot
 if __name__=="__main__":
 
     parser = argparse.ArgumentParser(description='Training script')
-    parser.add_argument('--opt', type=str, default='D:\\tyh\phynet\option\simulate.yaml', help='Path to the configuration file')
+    parser.add_argument('--opt', type=str, default='/mnt/data/optimal/tangyuhang/workspace/iopen/ai4optical/phynet/option/simulate.yaml', help='Path to the configuration file')
     args = parser.parse_args()
     para = Parameter(args.opt)
 
